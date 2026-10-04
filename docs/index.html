@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seeing to Drive on a Single Board | DANIEL</title>
+  <meta name="description" content="An attention-free student of Depth Anything V2 runs at 27 FPS on a Raspberry Pi 5 + Hailo-8L, int8 equal to float, and drives a rover with onboard mapping, hybrid-A* planning and SLAM.">
+  <meta property="og:title" content="Seeing to Drive on a Single Board">
+  <meta property="og:description" content="Foundation-quality monocular depth on a Raspberry Pi 5 + Hailo-8L at 27 FPS, and the onboard obstacle avoidance, planning and SLAM it enables.">
+  <meta property="og:image" content="https://itaim18.github.io/seeing-to-drive/assets/media/og.jpg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%23ec6a48'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="#top" aria-label="DANIEL, back to top"><span class="brand-dot" aria-hidden="true"></span>DANIEL</a>
+  <nav class="nav-links" aria-label="Primary">
+    <a href="#demos">Demos</a>
+    <a href="#method" class="opt">Method</a>
+    <a href="#results">Results</a>
+    <a href="paper.pdf">Paper</a>
+    <a href="https://huggingface.co/datasets/itaimizlish/daniel-yard-depth" class="opt">Data</a>
+  </nav>
+</header>
+
+<main id="top">
+<section class="hero" aria-labelledby="hero-title">
+  <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="assets/media/hero_poster.jpg" aria-hidden="true">
+    <source src="assets/media/hero.mp4" type="video/mp4">
+  </video>
+  <div class="hero-scrim" aria-hidden="true"></div>
+  <div class="hero-copy">
+    <p class="eyebrow">Raspberry Pi 5 + Hailo-8L &nbsp;·&nbsp; 27 FPS &nbsp;·&nbsp; everything onboard</p>
+    <h1 id="hero-title">Seeing to Drive on a <em>Single Board</em></h1>
+    <p class="subtitle">An attention-free student of Depth Anything&nbsp;V2 that runs on a 13-TOPS integer NPU with int8 equal to float,
+      and the onboard obstacle avoidance, global planning and SLAM it makes possible on a small rover.</p>
+    <p class="author">Itai M. <span>&nbsp;·&nbsp; DANIEL: Depth Anything Navigation In Exteriors, Learned &nbsp;·&nbsp; 2026</span></p>
+    <div class="hero-actions">
+      <a class="button primary" href="paper.pdf">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15H6zM14 3.5V8h4.5M8.5 12h7v1.5h-7zm0 3h7v1.5h-7z"/></svg>Paper</a>
+      <a class="button" href="thesis.pdf">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4zm16 0h-4a3 3 0 0 0-1.5.4V19a3 3 0 0 1 1.5-.5H20z"/></svg>Thesis</a>
+      <a class="button" href="https://huggingface.co/datasets/itaimizlish/daniel-yard-depth">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3zm-8 5.3C5.6 9.5 8.6 10.2 12 10.2s6.4-.7 8-1.9V12c0 1.7-3.6 3-8 3s-8-1.3-8-3zm0 6c1.6 1.2 4.6 1.9 8 1.9s6.4-.7 8-1.9V18c0 1.7-3.6 3-8 3s-8-1.3-8-3z"/></svg>Dataset</a>
+      <a class="button" href="https://huggingface.co/itaimizlish/daniel-student-depth">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7zm0 2.3L18.6 8 12 11.7 5.4 8zM5 9.7l6 3.4v6.6l-6-3.4zm8 10V13l6-3.3v6.6z"/></svg>Model</a>
+      <a class="button" href="#cite">BibTeX</a>
+    </div>
+    <p class="wipe-hint" aria-hidden="true"><span><b>left</b> real robot camera</span><span><b>right</b> depth computed on the Hailo-8L</span></p>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="tldr">
+  <div class="keys">
+    <div class="key"><b class="c">27.1&nbsp;FPS</b><span>depth at 288×512 on the Hailo-8L, batch&nbsp;1, measured on the Pi</span></div>
+    <div class="key"><b class="t">r&nbsp;=&nbsp;0.99993</b><span>int8 on the chip vs the same network in float, 500 frames</span></div>
+    <div class="key"><b class="g">0.269</b><span>AbsRel on held-out metric ground truth; next best on the chip 0.354</span></div>
+    <div class="key"><b>8.2&nbsp;/&nbsp;10</b><span>scenes reached with no contact, with the real Pi + Hailo in the real-time loop</span></div>
+  </div>
+  <div class="section-heading" style="margin-top:46px">
+    <h2 id="tldr">Foundation depth does not reach a small NPU through better quantisation.</h2>
+    <p class="lead">The Hailo-8L runs attention in int8, and diffuse attention at a few hundred tokens falls below one quantisation
+      step: our build of Depth Anything V2 and the vendor's both erase obstacles. We distil the 335&nbsp;M-parameter teacher into a
+      24.5&nbsp;M-parameter network with no attention at all, range obstacles from where they meet the floor, and run mapping,
+      hybrid-A* planning and SLAM on the Pi itself.</p>
+  </div>
+</section>
+
+<section class="section" id="demos" aria-labelledby="demos-title">
+  <div class="section-heading">
+    <p class="eyebrow">Demos</p>
+    <h2 id="demos-title">The real board, in the loop and on real video.</h2>
+  </div>
+  <div class="video-grid">
+    <article class="video-card">
+      <video controls playsinline muted preload="none" poster="assets/media/real_pi_loop_poster.jpg"><source src="assets/media/real_pi_loop.mp4" type="video/mp4"></video>
+      <div class="video-copy"><span class="tag c">Real Pi 5 + Hailo-8L in the loop</span>
+        <h3>The deployed stack drives on its own SLAM pose</h3>
+        <p>Isaac Sim streams the car's camera to the real Pi; the Pi computes depth on the Hailo, maps, plans and replies with
+          steering and throttle, applied only when they arrive. The six scenes one recorded pass completed with no contact, each
+          uncut; that pass scored 6 clean and 7 reached of 10, the five-seed mean is 8.2.</p></div>
+    </article>
+    <article class="video-card">
+      <video controls playsinline muted preload="none" poster="assets/media/onboard_demo_poster.jpg"><source src="assets/media/onboard_demo.mp4" type="video/mp4"></video>
+      <div class="video-copy"><span class="tag">Real robot camera</span>
+        <h3>Depth, point cloud and obstacle scan from one camera</h3>
+        <p>Real robot video with depth computed on the Hailo-8L (student v3 HEF, every frame read back from the chip), the metric
+          point cloud scaled by the floor, and the ground-contact scan with the chosen arc.</p></div>
+    </article>
+    <article class="video-card">
+      <video controls playsinline muted preload="none" poster="assets/media/real_pi_reel_poster.jpg"><source src="assets/media/real_pi_reel.mp4" type="video/mp4"></video>
+      <div class="video-copy"><span class="tag g">All ten scenes</span>
+        <h3>A full real-board pass, failures included</h3>
+        <p>Every scene of the same pass, labelled with its outcome on the car's real footprint: chairs, a cone slalom, a barrel
+          gate, people, mixed clutter and a crate wall, with timeouts where they happened.</p></div>
+    </article>
+    <article class="video-card" aria-labelledby="cmp-title">
+      <div class="compare" id="compare" style="--pos:50%">
+        <img class="base" src="assets/media/pair1_rgb.jpg" alt="Real robot camera frame" id="cmp-rgb">
+        <img class="top" src="assets/media/pair1_depth.jpg" alt="Depth computed on the Hailo-8L for the same frame" id="cmp-dep">
+        <div class="bar"></div><div class="knob" aria-hidden="true">⇆</div>
+        <span class="lab l">camera</span><span class="lab r">Hailo-8L depth</span>
+        <input type="range" min="0" max="100" value="50" aria-label="Reveal the depth map" id="cmp-range">
+      </div>
+      <div class="video-copy"><span class="tag">Drag</span>
+        <h3 id="cmp-title">Camera ↔ depth from the chip</h3>
+        <p>Held-out real frames; depth from the deployed student v5, read back from the Hailo-8L.</p>
+        <div class="tabs" role="group" aria-label="Choose a frame">
+          <button type="button" aria-pressed="true" data-k="1">Chair base</button>
+          <button type="button" aria-pressed="false" data-k="0">Room</button>
+          <button type="button" aria-pressed="false" data-k="2">Pillar</button>
+        </div></div>
+    </article>
+  </div>
+</section>
+
+<section class="section" id="method" aria-labelledby="method-title">
+  <div class="section-heading">
+    <p class="eyebrow">Method</p>
+    <h2 id="method-title">Three ideas, each measured on the chip.</h2>
+  </div>
+  <div class="method">
+    <article class="card">
+      <span class="num">01</span>
+      <h3>Why transformer depth breaks on the Hailo-8L</h3>
+      <p>At the chip's 449 tokens, a diffuse softmax weight is about 1/449 ≈ 0.0022, below one uniform int8 step of 1/255 ≈ 0.0039.
+        Measured in float, <b>91&nbsp;%</b> of attention weights fall below that step and carry <b>17–33&nbsp;%</b> of each query's
+        attention mass. Re-calibration and quantisation fine-tuning do not fix it; removing attention does.</p>
+      <figure><img src="assets/media/fig_attn_int8.jpg" alt="Per-block share of attention weights below one int8 step and the attention mass they carry" loading="lazy"></figure>
+    </article>
+    <article class="card">
+      <span class="num">02</span>
+      <h3>An attention-free student</h3>
+      <p>A ResNet-34 encoder and a U-Net decoder of convolution, batch norm, ReLU and bilinear upsampling: every operation quantises
+        cleanly. 24.5&nbsp;M parameters (DAv2-S: 24.8&nbsp;M), distilled from DAv2-Large with a scale- and shift-invariant loss,
+        then fine-tuned on rendered ground truth. On the chip: <b>35.1&nbsp;ms</b>, int8 = float at <b>r&nbsp;0.99993</b>.</p>
+      <figure class="dark">
+        <svg viewBox="0 0 330 120" role="img" aria-label="U-Net: five encoder stages shrinking, five decoder stages growing, with skip connections">
+          <g fill="none" stroke="#8f9894" stroke-width="1.2">
+            <path d="M28 22 C 60 4, 270 4, 302 18"/><path d="M60 30 C 90 14, 240 14, 270 28"/><path d="M92 38 C 118 24, 212 24, 238 36"/><path d="M124 46 C 146 34, 184 34, 206 44"/>
+          </g>
+          <g fill="#9fb0c4" opacity="0.85">
+            <rect x="20" y="22" width="16" height="76" rx="2"/><rect x="52" y="30" width="16" height="60" rx="2"/><rect x="84" y="38" width="16" height="44" rx="2"/><rect x="116" y="46" width="16" height="28" rx="2"/><rect x="148" y="52" width="16" height="16" rx="2"/>
+          </g>
+          <g fill="#ec6a48" opacity="0.9">
+            <rect x="198" y="44" width="16" height="32" rx="2"/><rect x="230" y="36" width="16" height="48" rx="2"/><rect x="262" y="28" width="16" height="64" rx="2"/><rect x="294" y="18" width="16" height="84" rx="2"/>
+          </g>
+          <path d="M168 60 H194" stroke="#c4bdb0" stroke-width="1.5" marker-end="url(#a)"/>
+          <defs><marker id="a" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8z" fill="#c4bdb0"/></marker></defs>
+          <text x="20" y="114" fill="#9fb0c4" font-size="10" font-family="JetBrains Mono, monospace">ResNet-34 encoder</text>
+          <text x="214" y="114" fill="#ec6a48" font-size="10" font-family="JetBrains Mono, monospace">U-Net decoder</text>
+        </svg>
+      </figure>
+    </article>
+    <article class="card">
+      <span class="num">03</span>
+      <h3>Metric space without metric depth</h3>
+      <p>Relative depth has no scale. But where an obstacle meets the floor, the image row alone gives its distance from the camera
+        height. The network only has to say where each column's floor ends; the columns become a 69°, 4&nbsp;m laser scan, and the
+        floor profile becomes a ruler for a metric point cloud.</p>
+      <p class="eq">Z = f<sub>y</sub> · h / (v<sub>c</sub> − c<sub>y</sub>)</p>
+      <figure><img src="assets/media/fig_scan_bev.jpg" alt="Ground-contact scan hits on a held-out frame and in bird's-eye view against the true prop footprints" loading="lazy"></figure>
+    </article>
+  </div>
+
+  <ol class="pipeline" aria-label="The onboard pipeline">
+    <li><span class="where">camera</span><strong>RGB frame</strong><span class="t">30 Hz</span></li>
+    <li><span class="where npu">Hailo-8L NPU</span><strong>Student depth</strong><span class="t">35.0 ms, int8</span></li>
+    <li><span class="where">Pi CPU</span><strong>Ground-contact scan + cloud</strong><span class="t">in parallel with the NPU</span></li>
+    <li><span class="where">Pi CPU</span><strong>Hit-count map + SLAM</strong><span class="t">ground VO, encoder, gyro</span></li>
+    <li><span class="where">Pi worker</span><strong>Hybrid A* + safety cascade</strong><span class="t">110 ms median</span></li>
+    <li><span class="where">Pi CPU</span><strong>Pure pursuit → PWM</strong><span class="t">ESC brake gate</span></li>
+  </ol>
+</section>
+
+<section class="section" id="results" aria-labelledby="results-title">
+  <div class="section-heading">
+    <p class="eyebrow">Results</p>
+    <h2 id="results-title">Every depth network we could run on the Hailo-8L.</h2>
+    <p>400 held-out simulated frames with the renderer's metric depth and 100 held-out real robot frames. Every Hailo model runs on
+      the chip and is read back; per-frame least-squares scale and shift in disparity. <em>Obstacle</em> pixels are those that land on
+      a prop's collider, which removes the renderer's floor speckle.</p>
+  </div>
+  <div class="panel">
+    <div class="chart-head">
+      <h3>Accuracy against measured on-chip speed</h3>
+      <div class="tabs" role="group" aria-label="Metric" style="margin:0">
+        <button type="button" aria-pressed="true" data-m="absrel_obst">AbsRel · obstacles</button>
+        <button type="button" aria-pressed="false" data-m="absrel_all">AbsRel · all</button>
+        <button type="button" aria-pressed="false" data-m="real_r">r vs teacher · real</button>
+      </div>
+    </div>
+    <svg id="chart" viewBox="0 0 760 380" role="img" aria-label="Scatter of depth accuracy against frames per second on the Hailo-8L"></svg>
+    <p class="tip" id="tip">Hover or focus a point. Dashed lines: float GPU models that cannot run on the Pi at this rate.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Model</th><th>Runs on</th><th class="n">AbsRel all</th><th class="n">AbsRel obst.</th><th class="n">δ1</th><th class="n">r (real)</th><th class="n">Speed</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+  <figure class="figure">
+    <img src="assets/media/fig_qual_real.jpg" alt="Depth on real robot frames computed on the Hailo-8L by every model, against the float teacher" loading="lazy">
+    <figcaption>Real robot frames, depth as computed on the Hailo-8L (except the GPU teacher). The int8 transformer builds lose the
+      scene; the student keeps the teacher's structure at 27 FPS. Dark areas lie outside a model's input crop.</figcaption>
+  </figure>
+
+  <div class="section-heading" style="margin-top:80px">
+    <h2>Closing the loop: a real-time error budget.</h2>
+    <p>Ten frozen scenes in a Gaussian-splat reconstruction of a real yard, eleven obstacle types with honest colliders, at least five
+      seeds per arm, contacts scored on the car's real 0.557 × 0.294 m footprint. Clean goals of 10:</p>
+  </div>
+  <div class="panel">
+    <div class="budget">
+      <div class="brow"><span>Oracle: exact props, lockstep</span><div class="track"><div class="fill" style="width:98%"></div></div><span class="v">9.8</span></div>
+      <div class="brow"><span>Real time, exact obstacles</span><div class="track"><div class="fill" style="width:92%"></div></div><span class="v">9.2</span></div>
+      <div class="brow ours"><span>Hailo depth, simulator pose</span><div class="track"><div class="fill" style="width:79%"></div></div><span class="v">7.9 ± 1.1</span></div>
+      <div class="brow own"><span>Hailo depth, own SLAM pose</span><div class="track"><div class="fill" style="width:77%"></div></div><span class="v">7.7 ± 0.7</span></div>
+      <div class="brow pi"><span>Own pose, real Pi + Hailo</span><div class="track"><div class="fill" style="width:82%"></div></div><span class="v">8.2 ± 0.4</span></div>
+      <div class="brow"><span>Camera-only odometry</span><div class="track"><div class="fill" style="width:26%"></div></div><span class="v">2.6</span></div>
+    </div>
+    <p class="tip">Execution costs about 0.6, perception 1.3, self-localisation 0.2 clean goals (0.9 goals reached). Ten seeds for the
+      deployed arms, five for the others; the own-pose arms use a simulated wheel encoder and gyro.</p>
+  </div>
+  <div class="two">
+    <figure class="figure"><img src="assets/media/fig_scenes.jpg" alt="Clean success per scene for the main configurations" loading="lazy">
+      <figcaption>Per scene: the misses concentrate on the cone slalom, the gate, the chair cluster, the crate wall and the
+        person-and-cones scene.</figcaption></figure>
+    <figure class="figure"><img src="assets/media/fig_slam_path.jpg" alt="Every hybrid-A* plan in one episode with the SLAM estimate against the truth" loading="lazy">
+      <figcaption>Onboard SLAM and planning on the robot's own pose: every plan the Pi made in one slalom episode. The car reached
+        the goal despite 0.47&nbsp;m peak drift.</figcaption></figure>
+  </div>
+  <div class="two">
+    <figure class="figure"><img src="assets/media/fig_cloud_real.jpg" alt="A real robot frame lifted to a metric point cloud on the Pi" loading="lazy">
+      <figcaption>One real frame to metric 3D on the Pi: chip depth, scale from the floor profile, flying pixels removed.</figcaption></figure>
+    <figure class="figure"><img src="assets/media/fig_timing.jpg" alt="Per-frame stage timing on the Pi and hybrid-A* search times" loading="lazy">
+      <figcaption>The budget on the Pi: NPU 35&nbsp;ms overlapped with 47–49&nbsp;ms of CPU; 16.5&nbsp;Hz on 720p video with SLAM,
+        27&nbsp;Hz without; 28&nbsp;h of real-board runs without throttling.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="limits-title">
+  <div class="section-heading">
+    <p class="eyebrow">Honestly</p>
+    <h2 id="limits-title">What is not solved yet.</h2>
+  </div>
+  <ul class="limits">
+    <li><b>Not 10/10.</b> The oracle reaches 9.8, so the gap is real. Most remaining contacts are the car's front corner grazing the
+      side of a cone, a person or a crate the scan places 5–15&nbsp;cm too far out.</li>
+    <li><b>Low bases.</b> Cone plates and feet lower than the scan's 5&nbsp;cm threshold are invisible; ground-truth depth would resolve
+      them at 2&nbsp;cm, the student's blurred floor-to-base boundary does not.</li>
+    <li><b>Exploration.</b> With a ±34° camera the planner commits to routes through space it has not seen; one scene depends on this.</li>
+    <li><b>One yard, simulated odometry.</b> The suite is one reconstructed yard; the wheel encoder and gyro are simulated; the real
+      frames have no ground truth; v5 vs v3 is a tie on simulator pose and not significant on own pose (p ≈ 0.17).</li>
+  </ul>
+</section>
+
+<section class="section" aria-labelledby="res-title">
+  <div class="section-heading"><p class="eyebrow">Resources</p><h2 id="res-title">Everything to reproduce the numbers.</h2></div>
+  <div class="resources">
+    <a class="res" href="paper.pdf"><b>Paper</b><span>8 pages, IEEE two-column</span></a>
+    <a class="res" href="thesis.pdf"><b>Thesis</b><span>42 pages, every negative result</span></a>
+    <div class="res"><b>Code</b><span>onboard stack, HITL harness, scorers: available on request</span></div>
+    <a class="res" href="https://huggingface.co/datasets/itaimizlish/daniel-yard-depth"><b>Dataset</b><span>11.5 GB: benchmark, training set, loop logs</span></a>
+    <a class="res" href="https://huggingface.co/itaimizlish/daniel-student-depth"><b>Model</b><span>PyTorch, ONNX, Hailo-8L HEF</span></a>
+  </div>
+</section>
+
+<section class="section" id="cite" aria-labelledby="cite-title">
+  <div class="section-heading"><p class="eyebrow">Citation</p><h2 id="cite-title">BibTeX</h2></div>
+  <div class="bib">
+    <pre id="bibtex">@misc{itaim2026seeing,
+  title  = {Seeing to Drive on a Single Board: Attention-Free Distilled Depth on a
+            Raspberry Pi 5 + Hailo-8L for Onboard Obstacle Avoidance, Planning and SLAM},
+  author = {M., Itai},
+  year   = {2026},
+  url    = {https://itaim18.github.io/seeing-to-drive/}
+}</pre>
+    <button class="copy" type="button" id="copy">Copy</button>
+  </div>
+  <p style="color:var(--muted);margin-top:26px;font-size:0.92rem">Built on Depth Anything V2 and Depth Anything 3, the Hailo Model Zoo,
+    NVIDIA Isaac Sim / Isaac Lab and its neural-reconstruction rendering. Weights and data CC-BY-NC-4.0 (the teacher's licence).</p>
+</section>
+</main>
+
+<footer>
+  <span>Seeing to Drive on a Single Board · Itai M. · 2026</span>
+  <span><a href="#top">Back to top ↑</a></span>
+</footer>
+
+<script src="assets/main.js" defer></script>
+</body>
+</html>

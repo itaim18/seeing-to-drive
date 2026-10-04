@@ -1,0 +1,341 @@
+{
+ "models": [
+  {
+   "k": "hailo:dav2student_v5_288x512",
+   "name": "Ours: distilled student v5 (deployed)",
+   "where": "chip",
+   "input": "288×512",
+   "params": 24.5,
+   "fps": 27.1,
+   "absrel_obst": 0.1967,
+   "absrel_all": 0.2694,
+   "d1_all": 0.669,
+   "d1_obst": 0.7624,
+   "real_r": 0.9964
+  },
+  {
+   "k": "hailo:dav2student_v3_288x512",
+   "name": "Ours: student v3",
+   "where": "chip",
+   "input": "288×512",
+   "params": 24.5,
+   "fps": 27.1,
+   "absrel_obst": 0.2038,
+   "absrel_all": 0.2689,
+   "d1_all": 0.6744,
+   "d1_obst": 0.776,
+   "real_r": 0.9947
+  },
+  {
+   "k": "hailo:dav2_s_224x392_o0b8r80",
+   "name": "DAv2-S, our int8 build",
+   "where": "chip",
+   "input": "224×392",
+   "params": 24.8,
+   "fps": 16.6,
+   "absrel_obst": 0.3298,
+   "absrel_all": 0.4774,
+   "d1_all": 0.4234,
+   "d1_obst": 0.5912,
+   "real_r": 0.982
+  },
+  {
+   "k": "hailo:depth_anything_v2_vits",
+   "name": "DAv2-S, Hailo Model Zoo",
+   "where": "chip",
+   "input": "224×224",
+   "params": 24.8,
+   "fps": 21.6,
+   "absrel_obst": 0.3344,
+   "absrel_all": 0.3542,
+   "d1_all": 0.5932,
+   "d1_obst": 0.6187,
+   "real_r": 0.9785
+  },
+  {
+   "k": "hailo:scdepthv3",
+   "name": "SC-DepthV3, Hailo Model Zoo",
+   "where": "chip",
+   "input": "256×320",
+   "params": null,
+   "fps": 53.6,
+   "absrel_obst": 0.3518,
+   "absrel_all": 0.4143,
+   "d1_all": 0.5064,
+   "d1_obst": 0.6881,
+   "real_r": 0.9501
+  },
+  {
+   "k": "hailo:fast_depth",
+   "name": "FastDepth, Hailo Model Zoo",
+   "where": "chip",
+   "input": "224×224",
+   "params": null,
+   "fps": 121.3,
+   "absrel_obst": 0.7667,
+   "absrel_all": 0.5301,
+   "d1_all": 0.3441,
+   "d1_obst": 0.4768,
+   "real_r": 0.7086
+  },
+  {
+   "k": "dav2_l",
+   "name": "Depth Anything V2-L (teacher)",
+   "where": "gpu",
+   "input": "518",
+   "params": 335.3,
+   "fps": null,
+   "absrel_obst": 0.1441,
+   "absrel_all": 0.2841,
+   "d1_all": 0.6426,
+   "d1_obst": 0.8046,
+   "real_r": 1.0,
+   "gpu_ms": 175.3
+  },
+  {
+   "k": "dav2_b",
+   "name": "Depth Anything V2-B",
+   "where": "gpu",
+   "input": "518",
+   "params": 97.5,
+   "fps": null,
+   "absrel_obst": 0.1508,
+   "absrel_all": 0.2895,
+   "d1_all": 0.6374,
+   "d1_obst": 0.8,
+   "real_r": 0.9992,
+   "gpu_ms": 69.9
+  },
+  {
+   "k": "dav2_s",
+   "name": "Depth Anything V2-S",
+   "where": "gpu",
+   "input": "518",
+   "params": 24.8,
+   "fps": null,
+   "absrel_obst": 0.1499,
+   "absrel_all": 0.2827,
+   "d1_all": 0.6512,
+   "d1_obst": 0.813,
+   "real_r": 0.9986,
+   "gpu_ms": 38.8
+  },
+  {
+   "k": "da3_s",
+   "name": "Depth Anything 3-Small",
+   "where": "gpu",
+   "input": "native",
+   "params": 34.3,
+   "fps": null,
+   "absrel_obst": 0.1715,
+   "absrel_all": 0.3145,
+   "d1_all": 0.6107,
+   "d1_obst": 0.7604,
+   "real_r": 0.9876,
+   "gpu_ms": 41.8
+  },
+  {
+   "k": "da3_b",
+   "name": "Depth Anything 3-Base",
+   "where": "gpu",
+   "input": "native",
+   "params": 135.4,
+   "fps": null,
+   "absrel_obst": 0.1878,
+   "absrel_all": 0.3039,
+   "d1_all": 0.6159,
+   "d1_obst": 0.7345,
+   "real_r": 0.985,
+   "gpu_ms": 40.1
+  },
+  {
+   "k": "da3mono_l",
+   "name": "Depth Anything 3-Mono-L",
+   "where": "gpu",
+   "input": "native",
+   "params": 334.2,
+   "fps": null,
+   "absrel_obst": 0.1712,
+   "absrel_all": 0.295,
+   "d1_all": 0.5676,
+   "d1_obst": 0.747,
+   "real_r": 0.9833,
+   "gpu_ms": 41.1
+  }
+ ],
+ "arms": {
+  "o13": {
+   "label": "Oracle: exact props, the Navigator's planner (lockstep)",
+   "n": 5,
+   "clean": 9.8,
+   "sd": 0.4,
+   "reached": 10.0
+  },
+  "l21x": {
+   "label": "Real-time stack, EXACT obstacles (no perception)",
+   "n": 5,
+   "clean": 9.2,
+   "sd": 0.4,
+   "reached": 9.8
+  },
+  "p12rt": {
+   "label": "Student v1 + global planner (Pi)",
+   "n": 5,
+   "clean": 7.2,
+   "sd": 1.3,
+   "reached": 7.8
+  },
+  "p15rt": {
+   "label": "Student v3 + global planner (Pi)",
+   "n": 5,
+   "clean": 7.2,
+   "sd": 1.1,
+   "reached": 9.0
+  },
+  "l22rt": {
+   "label": "v3 + PLAN_STEER 0.85 + straight-back retreat",
+   "n": 5,
+   "clean": 7.4,
+   "sd": 0.5,
+   "reached": 9.2
+  },
+  "l26rt": {
+   "label": "+ floor-from-horizon, pinned-retreat wedge, blocked fix",
+   "n": 5,
+   "clean": 7.2,
+   "sd": 1.3,
+   "reached": 8.8
+  },
+  "l30rt": {
+   "label": "+ escape-radius planning",
+   "n": 5,
+   "clean": 6.8,
+   "sd": 1.1,
+   "reached": 8.6
+  },
+  "l31rt": {
+   "label": "+ PLAN_STEER 0.75 + floating overhangs (the deployed planner, v3)",
+   "n": 10,
+   "clean": 7.9,
+   "sd": 1.0,
+   "reached": 9.0
+  },
+  "l32rt": {
+   "label": "+ base skirt on small obstacles (rejected)",
+   "n": 5,
+   "clean": 7.2,
+   "sd": 1.1,
+   "reached": 8.2
+  },
+  "l35rt": {
+   "label": "+ look first (neutral on own pose; not deployed)",
+   "n": 5,
+   "clean": 8.0,
+   "sd": 0.0,
+   "reached": 8.8
+  },
+  "l36rt": {
+   "label": "+ terrain-escape pass (neutral)",
+   "n": 5,
+   "clean": 7.8,
+   "sd": 1.1,
+   "reached": 9.2
+  },
+  "l37rt": {
+   "label": "+ faster follower (neutral)",
+   "n": 5,
+   "clean": 7.4,
+   "sd": 0.5,
+   "reached": 8.6
+  },
+  "l38rt": {
+   "label": "Student v5 (floor-weighted loss)  [deployed]",
+   "n": 10,
+   "clean": 7.9,
+   "sd": 1.1,
+   "reached": 9.0
+  },
+  "l39rt": {
+   "label": "+ cone colour contacts (rejected)",
+   "n": 5,
+   "clean": 7.8,
+   "sd": 1.1,
+   "reached": 8.6
+  },
+  "p12full": {
+   "label": "Own pose: ground-plane VO only",
+   "n": 5,
+   "clean": 2.6,
+   "sd": 0.9,
+   "reached": 3.6
+  },
+  "p16imu": {
+   "label": "Own pose: v3 + sim encoder + gyro",
+   "n": 5,
+   "clean": 6.0,
+   "sd": 1.4,
+   "reached": 7.6
+  },
+  "l22imu": {
+   "label": "Own pose: l22 planner + encoder + gyro",
+   "n": 5,
+   "clean": 6.2,
+   "sd": 1.3,
+   "reached": 7.4
+  },
+  "l31imu": {
+   "label": "Own pose: deployed planner + encoder + gyro",
+   "n": 5,
+   "clean": 7.0,
+   "sd": 0.7,
+   "reached": 7.0
+  },
+  "l34imu": {
+   "label": "Own pose: + encoder-gated slip guard (deployed planner, v3)",
+   "n": 10,
+   "clean": 7.1,
+   "sd": 0.9,
+   "reached": 7.4
+  },
+  "l35imu": {
+   "label": "Own pose: + look first",
+   "n": 10,
+   "clean": 6.8,
+   "sd": 0.9,
+   "reached": 7.2
+  },
+  "l37imu": {
+   "label": "Own pose: + faster follower",
+   "n": 5,
+   "clean": 7.2,
+   "sd": 0.8,
+   "reached": 7.8
+  },
+  "l38imu": {
+   "label": "Own pose: student v5  [deployed]",
+   "n": 10,
+   "clean": 7.7,
+   "sd": 0.7,
+   "reached": 8.1
+  },
+  "p38imu": {
+   "label": "Own pose: student v5 on the REAL Pi + Hailo  [deployed]",
+   "n": 5,
+   "clean": 8.2,
+   "sd": 0.4,
+   "reached": 8.4
+  },
+  "l39imu": {
+   "label": "Own pose: + cone colour",
+   "n": 5,
+   "clean": 6.4,
+   "sd": 0.5,
+   "reached": 7.2
+  }
+ },
+ "chipfid": {
+  "pearson_p50": 0.99995,
+  "pearson_p5": 0.99897,
+  "n": 500
+ }
+}
