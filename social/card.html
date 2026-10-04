@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Social card</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&family=JetBrains+Mono:wght@600;700&family=Space+Grotesk:wght@600;700&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; background: #0f1112; }
+  .card { position: relative; width: 1200px; height: 630px; overflow: hidden; font-family: Inter, sans-serif; color: #f4efe6;
+          background:
+            radial-gradient(60% 80% at 82% 50%, rgba(236, 106, 72, 0.22) 0%, rgba(236, 106, 72, 0) 70%),
+            radial-gradient(90% 120% at 0% 0%, #1c2021 0%, #0f1112 60%); }
+  .copy { position: absolute; left: 60px; top: 56px; width: 470px; }
+  .brand { display: flex; align-items: center; gap: 12px; font: 700 20px/1 "Space Grotesk", sans-serif; letter-spacing: 0.08em; }
+  .dot { width: 13px; height: 13px; border-radius: 50%; background: #ec6a48; box-shadow: 0 0 16px #ec6a48; }
+  .eyebrow { margin-top: 38px; font: 700 15px/1.3 "JetBrains Mono", monospace; letter-spacing: 0.14em; text-transform: uppercase; color: #5cc5b4; }
+  h1 { margin-top: 14px; font: 700 58px/1.0 "Space Grotesk", sans-serif; letter-spacing: -0.03em; }
+  h1 em { font-style: normal; color: #ec6a48; }
+  .sub { margin-top: 20px; font: 500 20px/1.42 Inter, sans-serif; color: #c4bdb0; }
+  .nums { position: absolute; left: 60px; bottom: 56px; display: flex; gap: 30px; }
+  .nums b { display: block; font: 700 30px/1 "Space Grotesk", sans-serif; letter-spacing: -0.02em; }
+  .nums span { display: block; margin-top: 7px; font: 600 12px/1.2 "JetBrains Mono", monospace; letter-spacing: 0.06em; text-transform: uppercase; color: #8f9894; }
+  .c { color: #ec6a48; } .t { color: #5cc5b4; } .g { color: #e9c25a; }
+  /* the visual: the whole real frame, split camera | depth computed on the Hailo-8L */
+  .frame { position: absolute; left: 556px; top: 120px; width: 608px; height: 342px; border-radius: 18px; overflow: hidden;
+           box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(244, 239, 230, 0.14); transform: rotate(-1.2deg); }
+  .frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .frame .dep { clip-path: polygon(41% 0, 100% 0, 100% 100%, 33% 100%); }
+  .frame svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 0 8px rgba(244, 239, 230, 0.9)); }
+  .lab { position: absolute; top: 14px; padding: 5px 10px; border-radius: 7px; background: rgba(15, 17, 18, 0.72);
+         font: 600 14px/1.2 "JetBrains Mono", monospace; }
+  .lab.l { left: 14px; } .lab.r { right: 14px; color: #e9c25a; }
+  .url { position: absolute; right: 38px; bottom: 56px; font: 600 15px/1.2 "JetBrains Mono", monospace; color: #8f9894; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="copy">
+    <div class="brand"><span class="dot"></span>DANIEL</div>
+    <div class="eyebrow">Raspberry Pi 5 + Hailo-8L</div>
+    <h1>Seeing to Drive<br>on a <em>Single Board</em></h1>
+    <p class="sub">Foundation-quality depth on a 13-TOPS NPU, and the onboard avoidance, planning and SLAM it enables.</p>
+  </div>
+  <div class="frame">
+    <img src="rgb.jpg" alt="">
+    <img class="dep" src="depth.jpg" alt="">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="41" y1="0" x2="33" y2="100" stroke="#f4efe6" vector-effect="non-scaling-stroke" style="stroke-width:3px"/></svg>
+    <span class="lab l">camera</span><span class="lab r">depth on the Hailo-8L</span>
+  </div>
+  <div class="nums">
+    <div><b class="c">27 FPS</b><span>on the NPU</span></div>
+    <div><b class="t">int8 = float</b><span>r 0.99993</span></div>
+    <div><b class="g">8.2 / 10</b><span>real board in the loop</span></div>
+  </div>
+  <div class="url">itaim18.github.io/seeing-to-drive</div>
+</div>
+</body>
+</html>
