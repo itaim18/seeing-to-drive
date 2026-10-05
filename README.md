@@ -9,7 +9,9 @@ Itai M. · 2026
 [Project page](https://itaim18.github.io/seeing-to-drive/) · [Paper](docs/paper.pdf) · [Thesis](docs/thesis.pdf) ·
 [Dataset](https://huggingface.co/datasets/itaimizlish/daniel-yard-depth) · [Model](https://huggingface.co/itaimizlish/daniel-student-depth)
 
-<a href="https://itaim18.github.io/seeing-to-drive/"><img src="docs/assets/media/hero_poster.jpg" width="100%" alt="Robot camera and depth computed on the Hailo-8L"></a>
+<a href="https://itaim18.github.io/seeing-to-drive/"><img src="docs/assets/media/teaser.gif" width="100%" alt="4K camera on the left, depth computed on the Hailo-8L on the right">
+
+<sub>Left: the camera. Right: depth computed on the Raspberry Pi 5's Hailo-8L, every frame.</sub></a>
 
 </div>
 
