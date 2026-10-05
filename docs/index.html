@@ -61,7 +61,7 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7zm0 2.3L18.6 8 12 11.7 5.4 8zM5 9.7l6 3.4v6.6l-6-3.4zm8 10V13l6-3.3v6.6z"/></svg>Model</a>
       <a class="button" href="#cite">BibTeX</a>
     </div>
-    <p class="wipe-hint" aria-hidden="true"><span><b>left</b> real robot camera</span><span><b>right</b> depth computed on the Hailo-8L</span></p>
+    <p class="wipe-hint" aria-hidden="true"><span><b>left</b> 4K camera, outdoors</span><span><b>right</b> depth computed on the Hailo-8L, every frame</span></p>
   </div>
 </section>
 
@@ -87,6 +87,15 @@
     <h2 id="demos-title">The real board, in the loop and on real video.</h2>
   </div>
   <div class="video-grid">
+    <article class="video-card feature">
+      <video controls playsinline muted preload="none" poster="assets/media/showcase_poster.jpg"><source src="assets/media/showcase_1080p.mp4" type="video/mp4"></video>
+      <div class="video-copy"><span class="tag g">4K source · every frame on the Hailo-8L</span>
+        <h3>Outdoors: the deployed student, frame by frame on the NPU</h3>
+        <p>A low camera crossing a field toward rocks and posts. Every frame went through the student v5 HEF on the Raspberry Pi 5's
+          Hailo-8L (34.6&nbsp;ms per frame on the NPU) and was read back; the camera half is the 4K original. Frames from this
+          video (every 10th) were in the student's training set, so it is a demonstration, not a held-out result.
+          <a href="https://huggingface.co/itaimizlish/daniel-student-depth/resolve/main/media/showcase_4k.mp4">Download the 4K version</a>.</p></div>
+    </article>
     <article class="video-card">
       <video controls playsinline muted preload="none" poster="assets/media/real_pi_loop_poster.jpg"><source src="assets/media/real_pi_loop.mp4" type="video/mp4"></video>
       <div class="video-copy"><span class="tag c">Real Pi 5 + Hailo-8L in the loop</span>
