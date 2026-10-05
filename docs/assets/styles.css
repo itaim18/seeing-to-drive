@@ -58,7 +58,7 @@ p a, li a, figcaption a { color: var(--teal); text-decoration-thickness: 1px; te
   position: absolute; inset: 0;
   background:
     linear-gradient(180deg, rgba(15, 17, 18, 0.5) 0%, rgba(15, 17, 18, 0) 24%, rgba(15, 17, 18, 0.12) 60%, var(--bg) 100%),
-    radial-gradient(95% 75% at 0% 100%, rgba(15, 17, 18, 0.82) 0%, rgba(15, 17, 18, 0) 62%);
+    radial-gradient(105% 90% at 0% 85%, rgba(15, 17, 18, 0.8) 0%, rgba(15, 17, 18, 0) 64%);
 }
 .hero-copy { position: relative; width: min(var(--wrap), 100% - 32px); margin: 0 auto; padding: 120px 0 clamp(48px, 9vh, 96px); }
 .hero-copy .eyebrow, .hero-copy h1, .subtitle, .author, .wipe-hint { text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.5); }
@@ -204,3 +204,5 @@ footer { width: min(var(--wrap), 100% - 32px); margin: 90px auto 0; padding: 26p
 footer a { color: var(--muted); }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .button, .res { transition: none; } }
+
+.hero-copy .eyebrow { display: inline-block; padding: 6px 11px; border-radius: 8px; background: rgba(15, 17, 18, 0.62); backdrop-filter: blur(6px); }
