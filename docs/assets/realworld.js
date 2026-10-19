@@ -5,14 +5,20 @@
   if (!svg) return;
   const NS = "http://www.w3.org/2000/svg";
   // validated on the panel surface #171a1b (dataviz validator: all checks pass); fixed order by role
+  // Three hues, validated ALL-PAIRS on the panel surface (worst CVD dE 9.4): our depth sources only. The
+  // independent metric references are drawn in neutral ink (the yardstick, not a competitor); every other method
+  // is grey with its own dash, so identity never rests on colour alone.
   const ROLE = {
     ours: { c: "#d95926", w: 2.4, dash: "" },
     d435: { c: "#199e70", w: 2, dash: "" },
-    stereo_ref: { c: "#c98500", w: 2, dash: "" },
     vo: { c: "#3987e5", w: 1.6, dash: "" },
-    baseline: { c: "#d55181", w: 1.6, dash: "" },
+    stereo_ref: { c: "#f4efe6", w: 2.6, dash: "" },
+    rgbd_ref: { c: "#f4efe6", w: 2.6, dash: "9 3" },
+    baseline: { c: "#8f9894", w: 1.5, dash: "6 3" },
     dr: { c: "#8f9894", w: 1.4, dash: "5 4" },
   };
+  const DASH = { droid_mono_rgb: "6 3", vggtslam2_mono_rgb: "2 3", orbslam3_mono_rgb: "1 4", breezyslam_d435depth: "8 2 2 2" };
+  const style = t => ({ ...(ROLE[t.role] || ROLE.baseline), ...(t.role === "baseline" && DASH[t.key] ? { dash: DASH[t.key] } : {}) });
   const el = (n, a, parent) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); (parent || svg).appendChild(e); return e; };
   fetch("assets/realworld/slam.json").then(r => r.json()).then(D => {
     const W = 760, H = 560, pad = 28;
@@ -32,10 +38,11 @@
     const order = ["dr", "vo", "baseline", "stereo_ref", "d435", "ours"];        // ours drawn last, on top
     const tracks = [...D.tracks].sort((a, b) => order.indexOf(a.role) - order.indexOf(b.role));
     const marks = {}, lines = {};
-    const shownByDefault = t => ["ours", "d435", "stereo_ref", "vo"].includes(t.role) && t.coverage >= 0.5;
+    // the core comparison + every INDEPENDENT method that tracked the drive; degenerate or lost runs start hidden
+    const shownByDefault = t => t.coverage >= 0.5 && ["ours", "d435", "vo", "stereo_ref", "rgbd_ref"].includes(t.role);
     const visible = {}; tracks.forEach(t => { visible[t.key] = shownByDefault(t); });
     tracks.forEach(t => {
-      const st = ROLE[t.role] || ROLE.baseline;
+      const st = style(t);
       const pts = t.x.map((x, i) => P(x, t.y[i]).map(v => v.toFixed(1)).join(",")).join(" ");
       lines[t.key] = el("polyline", { points: pts, fill: "none", stroke: st.c, "stroke-width": st.w, "stroke-dasharray": st.dash,
         "stroke-linejoin": "round", "stroke-linecap": "round", opacity: t.role === "dr" ? 0.85 : 1,
@@ -49,10 +56,10 @@
     el("text", { x: s0[0] + 10, y: s0[1] + 4, fill: "#f4efe6", "font-size": 12 }).textContent = "start";
     // legend (always, >= 2 series) + table
     tracks.slice().reverse().forEach(t => {
-      const st = ROLE[t.role] || ROLE.baseline;
+      const st = style(t);
       const li = document.createElement("button"); li.type = "button"; li.className = "rw-key";
       li.setAttribute("aria-pressed", String(visible[t.key]));
-      li.innerHTML = `<i style="background:${st.c}${st.dash ? ";opacity:.8" : ""}"></i>`;
+      li.innerHTML = `<svg width="22" height="8" aria-hidden="true"><line x1="1" y1="4" x2="21" y2="4" stroke="${st.c}" stroke-width="2.5" stroke-dasharray="${st.dash}" stroke-linecap="round"/></svg>`;
       li.appendChild(document.createTextNode(t.label));
       li.addEventListener("click", () => {
         visible[t.key] = !visible[t.key]; li.setAttribute("aria-pressed", String(visible[t.key]));
@@ -64,8 +71,9 @@
       const mono = t.scale_given_by_alignment;   // monocular: no metric scale, so the alignment supplies it
       const partial = t.coverage < 0.5;
       if (partial) tr.className = (tr.className + " partial").trim();
-      [t.label + (mono ? " · scale given by alignment" : "") + (partial ? " · lost tracking" : ""),
+      [t.label + (mono ? " · scale given by alignment" : "") + (partial ? " · partial" : ""),
        Math.round(t.coverage * 100) + " % (" + t.seconds_tracked.toFixed(0) + " s)",
+       ref ? "–" : (t.skill >= 0 ? "+" : "") + t.skill.toFixed(2),
        ref ? "reference" : t.rms_m.toFixed(2) + " m", ref ? "–" : t.p90_m.toFixed(2) + " m",
        mono ? "–" : t.path_m.toFixed(1) + " m", mono ? "n/a" : t.path_ratio.toFixed(2)]
         .forEach((c, i) => { const td = document.createElement("td"); td.textContent = c; if (i) td.className = "n"; tr.appendChild(td); });

@@ -310,7 +310,7 @@
     <p class="tip" id="rw-meta"></p>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Method</th><th class="n">Tracked</th><th class="n">RMS vs reference</th><th class="n">90th pct</th><th class="n">Path</th><th class="n">Path / reference</th></tr></thead>
+        <thead><tr><th>Method</th><th class="n">Tracked</th><th class="n">Skill vs standing still</th><th class="n">RMS vs reference</th><th class="n">90th pct</th><th class="n">Path</th><th class="n">Path / reference</th></tr></thead>
         <tbody id="rw-rows"></tbody>
       </table>
     </div>
@@ -331,10 +331,13 @@
         depth source changes the map</em>, not which track is closer to the truth. Both runs share the same camera odometry,
         and scan matching then bends each by metres. Independent metric references (RTAB-Map with RealSense RGB-D, ORB-SLAM3
         stereo on the infrared pair) are being run and will be added here.</li>
-      <li><b>A 2026 learned SLAM disagrees with both.</b> VGGT-SLAM 2.0 (monocular, uncalibrated by design) tracked 98&nbsp;% of
-        the drive and closed 9 loops by appearance. Even with its scale fitted for it, its track sits 6.5&nbsp;m RMS from ours.
-        Without ground truth this drive cannot say who is right; the independent references and the tagged recordings
-        will.</li>
+      <li><b>Monocular learned SLAM did not reconstruct this drive.</b> DROID-SLAM and VGGT-SLAM 2.0 both reproduce their
+        published TUM fr1/desk errors before being run here (0.016 and 0.025&nbsp;m), and both tracked about 98&nbsp;% of the
+        drive. Yet even with their scale fitted for them, they beat a fake track parked at the centroid by only 23&nbsp;% and
+        11&nbsp;% ("skill"), and their fitted tracks collapse to a sliver. They agree no better with each other (28&nbsp;%). Our
+        runs score 49&ndash;55&nbsp;%. A camera 16&nbsp;cm above sunlit grass, turning fast, is a hard case for them. Our
+        three runs share one camera odometry, so their mutual agreement is common-mode, not proof. The metric, independent
+        references (RTAB-Map on RealSense RGB-D, ORB-SLAM3 on the stereo pair, in white) are being added.</li>
       <li><b>Two classic baselines failed outdoors.</b> CoreSLAM (BreezySLAM), a classic 2D laser SLAM fed the RealSense
         pseudo-scan, becomes unstable on these sparse outdoor scans (path 4.2&times; too long). Monocular ORB-SLAM3 lost
         tracking after 4.8&nbsp;s on sunlit grass.</li>
