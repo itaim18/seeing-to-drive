@@ -326,6 +326,17 @@
     </div>
   </div>
   <div class="panel" style="margin-top:22px">
+    <h3 style="margin-top:0">Which depth is better inside SLAM? The simulator answers, with ground truth</h3>
+    <p class="tip" style="margin:0 0 10px">The real drive has no ground truth, and our odometry fails upstream of the depth. In the
+      hardware-in-the-loop simulator the car drove a loop twice under three lighting presets, carrying a simulated RealSense
+      infrared pair (SGBM), a planar lidar and exact depth. Every source went through our SLAM; trajectory error (ATE) is
+      measured against the true poses, mean over the three sessions.</p>
+    <div class="table-scroll"><table><thead><tr><th>Front end and scan</th><th class="n">ATE, m</th><th>Note</th></tr></thead><tbody><tr><td>Deployed front end (ground visual odometry), any depth source</td><td class="n">0.53&ndash;0.67</td><td>scan match never moves the pose</td></tr><tr><td>Lidar ring as the scan</td><td class="n"><b>0.083 &plusmn; 0.013</b></td><td>22 closures, all within 0.3&nbsp;m</td></tr><tr><td>Deployed pseudo-scan: exact depth / SGBM stereo / ours</td><td class="n">0.84 / 0.81 / 0.65</td><td>exact depth no better than ours</td></tr><tr><td>Horizontal-plane scan, per-frame floor scale: exact / SGBM / ours</td><td class="n">0.50 / 0.36 / 0.43</td><td>the representation was part of it</td></tr><tr><td>Horizontal-plane scan, <em>true</em> metric scale: exact / SGBM</td><td class="n"><b>0.074 &plusmn; 0.003</b> / 0.195</td><td>exact depth = the lidar</td></tr></tbody></table></div>
+    <p class="tip" style="margin:10px 0 0"><b>For mapping, a stable metric scale matters more than depth accuracy.</b> Perfect
+      depth through our per-frame scale from camera height loses a factor of about seven against the same depth at its true
+      scale. That scale is right for avoiding obstacles and wrong for SLAM. Spread over lighting, not over random seeds.</p>
+  </div>
+  <div class="panel" style="margin-top:22px">
     <h3 style="margin-top:0">What this drive shows</h3>
     <ul class="rw-notes">
       <li><b>On real obstacles the network ranges like the RealSense; on grass, both stumble.</b> From the same poses, where both
