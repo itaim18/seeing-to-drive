@@ -328,7 +328,7 @@
     <h3 style="margin-top:0">What this drive shows</h3>
     <ul class="rw-notes">
       <li><b>On real obstacles the network ranges like the RealSense; on grass, both stumble.</b> From the same poses, where both
-        see an obstacle beyond 1&nbsp;m, the network's range is within 25&nbsp;% of the stereo's (median, ray by ray). That matches
+        see an obstacle beyond 1&nbsp;m, the network's range is within 25&nbsp;% of the stereo's (median over 819 frames of each frame's ray-by-ray gap; 28&nbsp;% pooled over all 17,546 rays). That matches
         the independent 1,000-point benchmark below. Inside 1&nbsp;m, both mark grass as obstacles, in different places. From 16&nbsp;cm
         the stereo resolves single tufts and marks 76&nbsp;% of image columns blocked. The network marks 41&nbsp;%, and sometimes
         draws a false band across motion-blurred lawn. Neither is right on grass, which this car drives straight over.</li>
