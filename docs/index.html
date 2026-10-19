@@ -33,6 +33,7 @@
     <a href="#demos">Demos</a>
     <a href="#method" class="opt">Method</a>
     <a href="#results">Results</a>
+    <a href="#realworld">Real world</a>
     <a href="paper.pdf">Paper</a>
     <a href="https://huggingface.co/datasets/itaimizlish/daniel-yard-depth" class="opt">Data</a>
   </nav>
@@ -290,6 +291,67 @@
   </div>
 </section>
 
+<section class="section" id="realworld" aria-labelledby="realworld-title">
+  <div class="section-heading">
+    <p class="eyebrow">Real world · new</p>
+    <h2 id="realworld-title">One drive through a park: our network against the Intel RealSense, through the same SLAM.</h2>
+    <p>The car drove 217 s (about 78 m) by hand through a park in full sun, recording everything: the colour camera, the RealSense D435's
+      on-chip stereo depth and both of its infrared images, and the depth the student computed on the Hailo-8L, frame by frame.
+      Offline, the robot's own mapping stack is fed each depth source in turn, so the only thing that changes is where the depth
+      comes from. There is no ground truth for this drive (no tags, no return to the start): the numbers below are
+      <em>agreement with a reference</em>, not accuracy.</p>
+  </div>
+  <div class="panel">
+    <div class="chart-head"><h3>Where each method thinks the car went</h3></div>
+    <p class="tip" style="margin:0 0 6px">Click a method to show or hide it. Failed and partial runs start hidden; all are in the table.</p>
+    <div class="rw-legend" id="rw-legend"></div>
+    <svg id="rw-chart" viewBox="0 0 760 560" role="img" aria-label="Trajectories of the same drive estimated by each method, aligned to the reference"></svg>
+    <p class="tip" id="rw-tip">Hover a track: dots mark every method's position at that same moment.</p>
+    <p class="tip" id="rw-meta"></p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Method</th><th class="n">Tracked</th><th class="n">RMS vs reference</th><th class="n">90th pct</th><th class="n">Path</th><th class="n">Path / reference</th></tr></thead>
+        <tbody id="rw-rows"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="rw-maps" style="margin-top:22px">
+    <figure><img src="assets/realworld/map_ours.png" alt="Occupancy map built from the network's depth on the Hailo-8L" loading="lazy">
+      <figcaption><b style="color:#d95926">Network depth</b> (student on the Hailo-8L, as computed live on the car).</figcaption></figure>
+    <figure><img src="assets/realworld/map_d435.png" alt="Occupancy map built from the RealSense stereo depth" loading="lazy">
+      <figcaption><b style="color:#199e70">RealSense stereo depth</b>, same SLAM, same frames, same alignment.</figcaption></figure>
+  </div>
+  <div class="panel" style="margin-top:22px">
+    <h3 style="margin-top:0">What this drive shows, and what it cannot</h3>
+    <ul class="rw-notes">
+      <li><b>Scale agrees.</b> Fed the network's depth instead of the RealSense's stereo depth, the same SLAM measures the
+        same drive 2&nbsp;% longer (path ratio 1.02), and its track stays within 3.7&nbsp;m RMS of the stereo-fed one over the
+        whole run. Without vision, the steering and throttle commands alone under-measure the distance by 36&nbsp;%.</li>
+      <li><b>The reference here is our own mapping stack fed RealSense depth.</b> The table measures <em>how much the
+        depth source changes the map</em>, not which track is closer to the truth. Both runs share the same camera odometry,
+        and scan matching then bends each by metres. Independent metric references (RTAB-Map with RealSense RGB-D, ORB-SLAM3
+        stereo on the infrared pair) are being run and will be added here.</li>
+      <li><b>A 2026 learned SLAM disagrees with both.</b> VGGT-SLAM 2.0 (monocular, uncalibrated by design) tracked 98&nbsp;% of
+        the drive and closed 9 loops by appearance. Even with its scale fitted for it, its track sits 6.5&nbsp;m RMS from ours.
+        Without ground truth this drive cannot say who is right; the independent references and the tagged recordings
+        will.</li>
+      <li><b>Two classic baselines failed outdoors.</b> CoreSLAM (BreezySLAM), a classic 2D laser SLAM fed the RealSense
+        pseudo-scan, becomes unstable on these sparse outdoor scans (path 4.2&times; too long). Monocular ORB-SLAM3 lost
+        tracking after 4.8&nbsp;s on sunlit grass.</li>
+      <li><b>The stereo camera has blind spots in sun.</b> 7 of 5,882 frames had no usable RealSense depth, from infrared
+        saturated by direct sun at the start and something on the lenses. Closer than its minimum range, a tree trunk
+        simply vanishes from the stereo depth while the network still sees it.</li>
+      <li><b>No loop was closed, and the drive explains why.</b> Of 205 places the car passed twice, 178 were driven in the
+        opposite direction. A forward camera with a 69&deg; field of view sees different things each way, so its scan cannot
+        close those loops the way a 360&deg; lidar would. The next recordings drive the same route twice in the same
+        direction, from a taped start mark, with AprilTags for true positions.</li>
+      <li><b>The recording had to be repaired first.</b> The capture tool's own text header byte-shifted every stereo
+        frame, which we recovered exactly from the lossless files. The RealSense's stereo timestamps also drift about
+        8&nbsp;% against real time, so frames are paired by image content instead. Both are fixed for future drives.</li>
+    </ul>
+  </div>
+</section>
+
 <section class="section" id="cite" aria-labelledby="cite-title">
   <div class="section-heading"><p class="eyebrow">Citation</p><h2 id="cite-title">BibTeX</h2></div>
   <div class="bib">
@@ -313,5 +375,6 @@
 </footer>
 
 <script src="assets/main.js" defer></script>
+<script src="assets/realworld.js" defer></script>
 </body>
 </html>

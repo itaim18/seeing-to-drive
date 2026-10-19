@@ -206,3 +206,17 @@ footer a { color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .button, .res { transition: none; } }
 
 .hero-copy .eyebrow { display: inline-block; padding: 6px 11px; border-radius: 8px; background: rgba(15, 17, 18, 0.62); backdrop-filter: blur(6px); }
+
+/* real-world SLAM section (2026-10-19) */
+.rw-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 4px 0 12px; }
+.rw-key { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 0.9rem; background: none; border: 1px solid var(--line); border-radius: 99px; padding: 4px 10px; cursor: pointer; font-family: inherit; }
+.rw-key[aria-pressed="false"] { opacity: 0.45; }
+.rw-key:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+tr.partial td { color: var(--soft); font-style: italic; }
+.rw-key i { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
+.rw-maps { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.rw-maps figure { margin: 0; }
+.rw-maps img { width: 100%; height: auto; border-radius: 10px; display: block; background: #171a1b; }
+.rw-maps figcaption { color: var(--muted); font-size: 0.9rem; margin-top: 8px; }
+.rw-notes li { margin: 6px 0; color: var(--muted); }
+@media (max-width: 760px) { .rw-maps { grid-template-columns: 1fr; } }
