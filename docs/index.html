@@ -321,36 +321,20 @@
     <figure><img src="assets/realworld/map_d435.png" alt="Occupancy map built from the RealSense stereo depth" loading="lazy">
       <figcaption><b style="color:#199e70">RealSense stereo depth</b>, same SLAM, same frames, same alignment.</figcaption></figure>
   </div>
-  <div class="panel" style="margin-top:22px">
-    <h3 style="margin-top:0">What this drive shows, and what it cannot</h3>
+  <div class="panel" style="margin-top:22px;border-color:#c98500">
+    <h3 style="margin-top:0">Correction, 19 October: the analysis above is being redone</h3>
     <ul class="rw-notes">
-      <li><b>Scale agrees.</b> Fed the network's depth instead of the RealSense's stereo depth, the same SLAM measures the
-        same drive 2&nbsp;% longer (path ratio 1.02), and its track stays within 3.7&nbsp;m RMS of the stereo-fed one over the
-        whole run. Without vision, the steering and throttle commands alone under-measure the distance by 36&nbsp;%.</li>
-      <li><b>The reference here is our own mapping stack fed RealSense depth.</b> The table measures <em>how much the
-        depth source changes the map</em>, not which track is closer to the truth. Both runs share the same camera odometry,
-        and scan matching then bends each by metres. Independent metric references (RTAB-Map with RealSense RGB-D, ORB-SLAM3
-        stereo on the infrared pair) are being run and will be added here.</li>
-      <li><b>Monocular learned SLAM did not reconstruct this drive.</b> DROID-SLAM and VGGT-SLAM 2.0 both reproduce their
-        published TUM fr1/desk errors before being run here (0.016 and 0.025&nbsp;m), and both tracked about 98&nbsp;% of the
-        drive. Yet even with their scale fitted for them, they beat a fake track parked at the centroid by only 23&nbsp;% and
-        11&nbsp;% ("skill"), and their fitted tracks collapse to a sliver. They agree no better with each other (28&nbsp;%). Our
-        runs score 49&ndash;55&nbsp;%. A camera 16&nbsp;cm above sunlit grass, turning fast, is a hard case for them. Our
-        three runs share one camera odometry, so their mutual agreement is common-mode, not proof. The metric, independent
-        references (RTAB-Map on RealSense RGB-D, ORB-SLAM3 on the stereo pair, in white) are being added.</li>
-      <li><b>Two classic baselines failed outdoors.</b> CoreSLAM (BreezySLAM), a classic 2D laser SLAM fed the RealSense
-        pseudo-scan, becomes unstable on these sparse outdoor scans (path 4.2&times; too long). Monocular ORB-SLAM3 lost
-        tracking after 4.8&nbsp;s on sunlit grass.</li>
-      <li><b>The stereo camera has blind spots in sun.</b> 7 of 5,882 frames had no usable RealSense depth, from infrared
-        saturated by direct sun at the start and something on the lenses. Closer than its minimum range, a tree trunk
-        simply vanishes from the stereo depth while the network still sees it.</li>
-      <li><b>No loop was closed, and the drive explains why.</b> Of 205 places the car passed twice, 178 were driven in the
-        opposite direction. A forward camera with a 69&deg; field of view sees different things each way, so its scan cannot
-        close those loops the way a 360&deg; lidar would. The next recordings drive the same route twice in the same
-        direction, from a taped start mark, with AprilTags for true positions.</li>
-      <li><b>The recording had to be repaired first.</b> The capture tool's own text header byte-shifted every stereo
-        frame, which we recovered exactly from the lossless files. The RealSense's stereo timestamps also drift about
-        8&nbsp;% against real time, so frames are paired by image content instead. Both are fixed for future drives.</li>
+      <li><b>Our comparison had a projection error.</b> Several visual SLAM systems report positions in the camera's optical
+        frame (y pointing down), and we took the wrong two axes for their ground plane. That discarded their forward motion
+        and made VGGT-SLAM 2.0 and ORB-SLAM3 look as if they had collapsed. <b>We withdraw the earlier claim that
+        monocular learned SLAM did not reconstruct this drive.</b></li>
+      <li><b>An independent metric reference now exists,</b> RTAB-Map on the RealSense's infrared image and stereo depth,
+        continuous over 97&nbsp;% of the drive. Against it, VGGT-SLAM 2.0 and ORB-SLAM3 reproduce the drive well. On this
+        outdoor drive, <b>our onboard camera odometry measures the drive about 2.3&times; too short</b>, so the trajectories of
+        our stack above, fed either depth source, should not be read as correct. We are diagnosing the cause; the leading
+        suspect is a fallback to a speed model calibrated in simulation.</li>
+      <li>The chart and table above still show the earlier, flawed reference. They will be replaced with the corrected
+        analysis, together with the diagnosis.</li>
     </ul>
   </div>
 </section>
