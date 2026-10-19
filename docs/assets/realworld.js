@@ -13,7 +13,9 @@
     d435: { c: "#199e70", w: 2, dash: "" },
     vo: { c: "#3987e5", w: 1.6, dash: "" },
     stereo_ref: { c: "#f4efe6", w: 2.6, dash: "" },
-    rgbd_ref: { c: "#f4efe6", w: 2.6, dash: "9 3" },
+    rgbd_ref: { c: "#f4efe6", w: 2.6, dash: "" },
+    deployed: { c: "#d95926", w: 1.4, dash: "4 3" },            // same depth source as "ours", the gate as deployed
+    deployed_d435: { c: "#199e70", w: 1.4, dash: "4 3" },
     baseline: { c: "#8f9894", w: 1.5, dash: "6 3" },
     dr: { c: "#8f9894", w: 1.4, dash: "5 4" },
   };
@@ -35,11 +37,11 @@
     const [sbx, sby] = [W - pad - 5 * s, H - pad / 2 - 4];
     el("line", { x1: sbx, x2: W - pad, y1: sby, y2: sby, stroke: "#c4bdb0", "stroke-width": 2 });
     el("text", { x: W - pad, y: sby - 6, "text-anchor": "end", fill: "#c4bdb0", "font-size": 12 }).textContent = "5 m";
-    const order = ["dr", "vo", "baseline", "stereo_ref", "d435", "ours"];        // ours drawn last, on top
+    const order = ["dr", "baseline", "deployed_d435", "deployed", "vo", "stereo_ref", "d435", "rgbd_ref", "ours"];
     const tracks = [...D.tracks].sort((a, b) => order.indexOf(a.role) - order.indexOf(b.role));
     const marks = {}, lines = {};
     // the core comparison + every INDEPENDENT method that tracked the drive; degenerate or lost runs start hidden
-    const shownByDefault = t => t.coverage >= 0.5 && ["ours", "d435", "vo", "stereo_ref", "rgbd_ref"].includes(t.role);
+    const shownByDefault = t => t.coverage >= 0.5 && ["ours", "d435", "rgbd_ref", "deployed"].includes(t.role);
     const visible = {}; tracks.forEach(t => { visible[t.key] = shownByDefault(t); });
     tracks.forEach(t => {
       const st = style(t);

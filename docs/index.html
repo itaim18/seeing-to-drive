@@ -294,16 +294,25 @@
 <section class="section" id="realworld" aria-labelledby="realworld-title">
   <div class="section-heading">
     <p class="eyebrow">Real world · new</p>
-    <h2 id="realworld-title">One drive through a park: our network against the Intel RealSense, through the same SLAM.</h2>
-    <p>The car drove 217 s (about 78 m) by hand through a park in full sun, recording everything: the colour camera, the RealSense D435's
+    <h2 id="realworld-title">One drive through a park: our network against the Intel RealSense, in depth and in SLAM.</h2>
+    <p>The car drove 216&nbsp;s by hand through a park in full sun, recording everything: the colour camera, the RealSense D435's
       on-chip stereo depth and both of its infrared images, and the depth the student computed on the Hailo-8L, frame by frame.
-      Offline, the robot's own mapping stack is fed each depth source in turn, so the only thing that changes is where the depth
-      comes from. There is no ground truth for this drive (no tags, no return to the start): the numbers below are
-      <em>agreement with a reference</em>, not accuracy.</p>
+      There is no ground truth on this drive. The yardstick is an <em>independent</em> metric system, RTAB-Map run on the
+      RealSense's own infrared image and stereo depth, continuous over 97&nbsp;% of the drive, and several unrelated SLAM
+      systems agree with it.</p>
   </div>
-  <div class="panel">
+  <figure class="figure" style="margin-top:0">
+    <video src="assets/realworld/drive.mp4" controls playsinline muted preload="metadata" poster="assets/realworld/drive_poster.jpg"
+      style="width:100%;border-radius:14px;display:block;background:#0b0e10"></video>
+    <figcaption>Both panels map the drive from the same reference poses, seen by a camera that follows the car, so only the depth
+      differs. Left: pseudo-lidar from the RealSense stereo. Right: pseudo-lidar from our network, as computed live on the car.
+      Glowing walls are cells each source mapped as occupied (1&nbsp;m floor grid); the cone ahead of the car is its camera's field of view. Header: the median range gap between the two scans for obstacles beyond 1&nbsp;m, ray by ray; below it, how much of the view
+      each source calls blocked.
+      Red diamonds: moments the stereo went blind in direct sun. People in the camera inset are blurred.</figcaption>
+  </figure>
+  <div class="panel" style="margin-top:22px">
     <div class="chart-head"><h3>Where each method thinks the car went</h3></div>
-    <p class="tip" style="margin:0 0 6px">Click a method to show or hide it. Failed and partial runs start hidden; all are in the table.</p>
+    <p class="tip" style="margin:0 0 6px">White: the independent reference. Click a method to show or hide it; all are in the table.</p>
     <div class="rw-legend" id="rw-legend"></div>
     <svg id="rw-chart" viewBox="0 0 760 560" role="img" aria-label="Trajectories of the same drive estimated by each method, aligned to the reference"></svg>
     <p class="tip" id="rw-tip">Hover a track: dots mark every method's position at that same moment.</p>
@@ -315,26 +324,75 @@
       </table>
     </div>
   </div>
-  <div class="rw-maps" style="margin-top:22px">
-    <figure><img src="assets/realworld/map_ours.png" alt="Occupancy map built from the network's depth on the Hailo-8L" loading="lazy">
-      <figcaption><b style="color:#d95926">Network depth</b> (student on the Hailo-8L, as computed live on the car).</figcaption></figure>
-    <figure><img src="assets/realworld/map_d435.png" alt="Occupancy map built from the RealSense stereo depth" loading="lazy">
-      <figcaption><b style="color:#199e70">RealSense stereo depth</b>, same SLAM, same frames, same alignment.</figcaption></figure>
-  </div>
-  <div class="panel" style="margin-top:22px;border-color:#c98500">
-    <h3 style="margin-top:0">Correction, 19 October: the analysis above is being redone</h3>
+  <div class="panel" style="margin-top:22px">
+    <h3 style="margin-top:0">What this drive shows</h3>
     <ul class="rw-notes">
-      <li><b>Our comparison had a projection error.</b> Several visual SLAM systems report positions in the camera's optical
-        frame (y pointing down), and we took the wrong two axes for their ground plane. That discarded their forward motion
-        and made VGGT-SLAM 2.0 and ORB-SLAM3 look as if they had collapsed. <b>We withdraw the earlier claim that
-        monocular learned SLAM did not reconstruct this drive.</b></li>
-      <li><b>An independent metric reference now exists,</b> RTAB-Map on the RealSense's infrared image and stereo depth,
-        continuous over 97&nbsp;% of the drive. Against it, VGGT-SLAM 2.0 and ORB-SLAM3 reproduce the drive well. On this
-        outdoor drive, <b>our onboard camera odometry measures the drive about 2.3&times; too short</b>, so the trajectories of
-        our stack above, fed either depth source, should not be read as correct. We are diagnosing the cause; the leading
-        suspect is a fallback to a speed model calibrated in simulation.</li>
-      <li>The chart and table above still show the earlier, flawed reference. They will be replaced with the corrected
-        analysis, together with the diagnosis.</li>
+      <li><b>On real obstacles the network ranges like the RealSense; on grass, both stumble.</b> From the same poses, where both
+        see an obstacle beyond 1&nbsp;m, the network's range is within 25&nbsp;% of the stereo's (median, ray by ray). That matches
+        the independent 1,000-point benchmark below. Inside 1&nbsp;m, both mark grass as obstacles, in different places. From 16&nbsp;cm
+        the stereo resolves single tufts and marks 76&nbsp;% of image columns blocked. The network marks 41&nbsp;%, and sometimes
+        draws a false band across motion-blurred lawn. Neither is right on grass, which this car drives straight over.</li>
+      <li><b>Our onboard odometry is the weak link, not the depth.</b> As deployed, our stack measured the drive 2.3&times; too short.
+        The cause: a plausibility gate in its camera odometry rejected any motion faster than the <em>simulated</em> car's top
+        speed. That threw away 23&nbsp;% of frames, exactly the fast ones, since the real car reaches about 2.9&nbsp;m/s. Opening the gate
+        to a physical bound fixes the scale (path within 8&nbsp;% of RTAB-Map's; the metric references themselves differ by 10&ndash;13&nbsp;% in scale, so finer claims are not supported) but not the heading, which drifts on grass. The
+        fix in progress is a gyro (an IMU on the same bus) and per-frame camera tilt.</li>
+      <li><b>Independent systems agree with the reference.</b> VGGT-SLAM 2.0 (2026, monocular) reconstructs the drive with skill
+        +0.80. ORB-SLAM3 on the RealSense stereo pair or RGB-D does +0.87&ndash;0.89, but only on the 16&ndash;23&nbsp;% of the drive it tracks
+        before fragmenting into separate maps. DROID-SLAM +0.39, DPVO +0.29. Monocular ORB-SLAM3 and MASt3R-SLAM lose tracking
+        within seconds on sunlit grass. Each baseline first reproduced its published error on TUM fr1/desk.</li>
+      <li><b>Loop closure needs the right drive.</b> Of 205 places this car passed twice, 178 were driven the opposite way. A forward
+        camera with a 69&deg; field of view sees different things each way, so its scan cannot close those loops. The next recordings
+        drive one route twice in the same direction from a taped mark, with AprilTags for true positions.</li>
+      <li><b>Two corrections, published the same day.</b> The first version of this section compared against our own stack fed
+        RealSense depth, which shares our odometry, so its agreement was not evidence. It also projected several SLAM systems onto
+        the wrong plane (they report the camera's optical frame), which made them look collapsed. Both are fixed above.</li>
+      <li><b>The recording itself had to be repaired.</b> The capture tool's text header byte-shifted every stereo frame, which we
+        recovered exactly from the lossless files. The RealSense's stereo timestamps also drift about 8&nbsp;% against real time, so
+        frames are paired by image content.</li>
+    </ul>
+  </div>
+  <div class="panel" style="margin-top:22px">
+    <h3 style="margin-top:0">Depth, point by point: 1,000 points every method is scored on</h3>
+    <p style="color:var(--muted)">No lidar on the car, so the reference is three independent stereo matchers on the same infrared pair (the
+      D435's chip, OpenCV SGBM and Fast-FoundationStereo). They must agree within 2&nbsp;% + 1&nbsp;% per metre, between 0.3 and 3&nbsp;m. The 1,000
+      points are balanced across five distance bins from 317 frames, inside the region every model sees. Relative models get their
+      scale (and shift) fitted on other points of the same frame, never the scored ones. A stereo matcher is scored only against
+      the other two.</p>
+    <div class="table-scroll"><table><thead><tr><th>Depth source</th><th>Runs on</th><th class="n">AbsRel · per frame</th><th class="n">&delta;1</th><th class="n">AbsRel · one scale per drive</th><th class="n">Raw metric: pred / true</th></tr></thead><tbody>
+<tr><td>Depth Anything 3-Large</td><td>GPU</td><td class="n">0.139</td><td class="n">0.81</td><td class="n">0.416</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything 3-Base</td><td>GPU</td><td class="n">0.143</td><td class="n">0.78</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything 3-Small</td><td>GPU</td><td class="n">0.146</td><td class="n">0.78</td><td class="n">0.393</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything 3-Mono-Large</td><td>GPU</td><td class="n">0.146</td><td class="n">0.80</td><td class="n">0.396</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything V2-S</td><td>GPU</td><td class="n">0.225</td><td class="n">0.79</td><td class="n">0.430</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything V2-B</td><td>GPU</td><td class="n">0.231</td><td class="n">0.79</td><td class="n">0.428</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything V2-L (teacher)</td><td>GPU</td><td class="n">0.235</td><td class="n">0.78</td><td class="n">0.426</td><td class="n">&ndash;</td></tr>
+<tr><td>MoGe-3</td><td>GPU</td><td class="n">0.256</td><td class="n">0.58</td><td class="n">0.298</td><td class="n">&times;3.4</td></tr>
+<tr><td>Ours, replayed on the chip</td><td>Hailo-8L int8</td><td class="n">0.265</td><td class="n">0.69</td><td class="n">0.486</td><td class="n">&ndash;</td></tr>
+<tr><td>DAv2-S, Hailo Model Zoo</td><td>Hailo-8L int8</td><td class="n">0.265</td><td class="n">0.71</td><td class="n">0.431</td><td class="n">&ndash;</td></tr>
+<tr><td>Ours, float twin</td><td>GPU</td><td class="n">0.267</td><td class="n">0.69</td><td class="n">0.489</td><td class="n">&ndash;</td></tr>
+<tr><td>MoGe-2</td><td>GPU</td><td class="n">0.268</td><td class="n">0.55</td><td class="n">0.309</td><td class="n">&times;3.2</td></tr>
+<tr class="ours"><td><b>Ours: distilled student v5, live on the car</b></td><td>Hailo-8L int8</td><td class="n">0.271</td><td class="n">0.68</td><td class="n">0.488</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything 3-Metric-Large</td><td>GPU</td><td class="n">0.309</td><td class="n">0.56</td><td class="n">0.386</td><td class="n">&times;2.3</td></tr>
+<tr><td>Depth Pro</td><td>GPU</td><td class="n">0.332</td><td class="n">0.56</td><td class="n">0.501</td><td class="n">&times;2.0</td></tr>
+<tr><td>UniDepthV2-L</td><td>GPU</td><td class="n">0.346</td><td class="n">0.57</td><td class="n">0.397</td><td class="n">&times;1.7</td></tr>
+<tr><td>SC-DepthV3, Hailo Model Zoo</td><td>Hailo-8L int8</td><td class="n">0.394</td><td class="n">0.24</td><td class="n">0.436</td><td class="n">&ndash;</td></tr>
+<tr><td>DAv2-S, our int8 build</td><td>Hailo-8L int8</td><td class="n">0.399</td><td class="n">0.53</td><td class="n">0.440</td><td class="n">&ndash;</td></tr>
+<tr><td>FastDepth, Hailo Model Zoo</td><td>Hailo-8L int8</td><td class="n">0.426</td><td class="n">0.22</td><td class="n">0.439</td><td class="n">&ndash;</td></tr>
+<tr class="sep"><td colspan="6"></td></tr>
+<tr><td>RealSense D435 on-chip stereo <span style="color:var(--soft)">(no depth on 5% of points)</span></td><td>stereo</td><td class="n">0.009</td><td class="n">1.00</td><td class="n">&ndash;</td><td class="n">metric</td></tr>
+<tr><td>OpenCV SGBM on the IR pair <span style="color:var(--soft)">(no depth on 17% of points)</span></td><td>stereo</td><td class="n">0.010</td><td class="n">1.00</td><td class="n">&ndash;</td><td class="n">metric</td></tr>
+<tr><td>Fast-FoundationStereo on the IR pair <span style="color:var(--soft)">(no depth on 0% of points)</span></td><td>stereo</td><td class="n">0.040</td><td class="n">0.97</td><td class="n">&ndash;</td><td class="n">metric</td></tr>
+</tbody></table></div>
+    <ul class="rw-notes" style="margin-top:14px">
+      <li><b>On the chip, our student ties the Hailo Model Zoo's Depth Anything V2-S on these points</b> (difference +0.008, p&nbsp;=&nbsp;0.67).
+        It beats every other edge build clearly (p&nbsp;&lt;&nbsp;0.001), and trails its GPU teacher by 0.04.</li>
+      <li><b>Metric foundation models misjudge scale from 16&nbsp;cm.</b> Trained on human-height cameras, all of them overestimate distance
+        here, by 1.7&times; (UniDepthV2) to 3.4&times; (MoGe-3). With one scale for the whole drive, the only option a robot really has,
+        MoGe-3 still beats every relative network. That is why our robot takes its scale from the camera's known height, every frame.</li>
+      <li><b>Where it has depth, the stereo is far more accurate</b> (0.9&ndash;1.0&nbsp;% vs 14&ndash;27&nbsp;%). The points here are where stereo works by
+        construction; sky, glare and objects closer than its minimum range are not in this set.</li>
+      <li>FastDepth's outputs on the chip are poor outdoors (an indoor-trained model). Calibration is nominal until the factory read.</li>
     </ul>
   </div>
 </section>
