@@ -284,7 +284,7 @@
   <div class="section-heading"><p class="eyebrow">Resources</p><h2 id="res-title">Everything to reproduce the numbers.</h2></div>
   <div class="resources">
     <a class="res" href="paper.pdf"><b>Paper</b><span>9 pages, IEEE two-column</span></a>
-    <a class="res" href="thesis.pdf"><b>Thesis</b><span>64 pages, every negative result</span></a>
+    <a class="res" href="thesis.pdf"><b>Thesis</b><span>65 pages, every negative result</span></a>
     <div class="res"><b>Code</b><span>onboard stack, HITL harness, scorers: available on request</span></div>
     <a class="res" href="https://huggingface.co/datasets/itaimizlish/daniel-yard-depth"><b>Dataset</b><span>11.5 GB: benchmark, training set, loop logs</span></a>
     <a class="res" href="https://huggingface.co/itaimizlish/daniel-student-depth"><b>Model</b><span>PyTorch, ONNX, Hailo-8L HEF</span></a>
@@ -424,7 +424,7 @@
       <li><b>On the chip, our student is indistinguishable from the Hailo Model Zoo's Depth Anything V2-S on these points</b>
         (difference +0.008, 95&nbsp;% CI &minus;0.026 to +0.039, p&nbsp;=&nbsp;0.67). The interval rules out an advantage for ours larger than
         0.026 (0.071 on the set rebuilt without Fast-FoundationStereo), so the simulator's advantage (0.269 vs 0.354, on held-out frames of the yard it was fine-tuned on) is absent on these
-        mostly-ground points; obstacle regions are not tested. Without Fast-FoundationStereo (D435 + SGBM only, a new 1,000-point
+        mostly-ground points. On a separate obstacle stratum (points at least 0.15&nbsp;m above each frame's floor plane: trunks, benches, bushes, people; 358 points, 95 frames), scored on the symmetric |log(predicted/true)| because a few blow-ups rule the mean there, ours leans the simulator's way against the zoo model (&minus;0.065, CI &minus;0.137 to +0.001, p&nbsp;=&nbsp;0.07): not resolved. Depth Anything 3 Large is better on obstacles by 0.154. Without Fast-FoundationStereo (D435 + SGBM only, a new 1,000-point
         set) the sign flips (&minus;0.023, CI &minus;0.071 to +0.020): still indistinguishable. It beats the other three edge builds (our int8 DAv2-S, SC-DepthV3, FastDepth)
         (p&nbsp;&lt;&nbsp;0.001; SC-DepthV3 and FastDepth get a median scale only) and trails its GPU teacher by 0.036 (paired 0.042,
         CI 0.016&ndash;0.067; without Fast-FoundationStereo +0.025, CI &minus;0.012 to +0.058, not resolved). On the three-matcher set,
