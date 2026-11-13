@@ -71,7 +71,7 @@
     <div class="key"><b class="c">27.1&nbsp;FPS</b><span>depth at 288×512 on the Hailo-8L, batch&nbsp;1, measured on the Pi</span></div>
     <div class="key"><b class="t">r&nbsp;=&nbsp;0.99993</b><span>int8 on the chip vs the same network in float, 500 frames</span></div>
     <div class="key"><b class="g">0.269</b><span>AbsRel on held-out simulated ground truth (next best on the chip 0.354); on real stereo-verified points, not resolvably different from the zoo DAv2-S</span></div>
-    <div class="key"><b>8.2&nbsp;/&nbsp;10</b><span>scenes reached with no contact, with the real Pi + Hailo in the real-time loop</span></div>
+    <div class="key"><b>8.2&thinsp;&plusmn;&thinsp;0.4&nbsp;/&nbsp;10</b><span>scenes reached with no contact (five seeds), with the real Pi + Hailo in the real-time loop</span></div>
   </div>
   <div class="section-heading" style="margin-top:46px">
     <h2 id="tldr">Foundation depth does not reach a small NPU through better quantisation.</h2>
@@ -316,14 +316,15 @@
       that need ground truth go to the hardware-in-the-loop simulator.</p>
     <ul class="glance">
       <li><b>Depth:</b> on 1,000 points where three stereo matchers agree, ours scores AbsRel 0.262 and the Hailo Model Zoo's
-        Depth Anything V2-S 0.234: a difference within noise (95&nbsp;% CI &minus;0.060 to +0.118).</li>
-      <li><b>Obstacles:</b> on 319 points that rise above the ground, ours leans toward fewer large errors than the zoo model (log
-        error &minus;0.165; p&nbsp;=&nbsp;0.041 with 10-s blocks as the unit, not significant after correcting for multiple tests; median not
-        lower, 0.232 vs 0.240). With one scale per drive it is worse on the two-matcher set (+0.334).</li>
+        Depth Anything V2-S 0.234: not resolvably different (95&nbsp;% CI &minus;0.060 to +0.118).</li>
+      <li><b>Obstacles:</b> the simulator's advantage is not shown on 319 points that rise above the ground (a lean on log error,
+        not significant once frame dependence and multiple tests are accounted for; with one scale per drive ours is worse on
+        the two-matcher set).</li>
       <li><b>Range:</b> beyond 1&nbsp;m the network places obstacle bases within a median 25&nbsp;% of the RealSense.</li>
       <li><b>SLAM:</b> independent systems agree with the reference (VGGT-SLAM 2.0 skill +0.80); ours scores &minus;0.11 as
-        deployed and the commands alone &minus;0.31. As deployed, depth barely enters our trajectory, so this drive cannot rank
-        the two depths inside our SLAM.</li>
+        deployed and the commands alone &minus;0.31, but under the same alignment the monocular methods get, +0.10 vs +0.08: ours does
+        not beat the commands like for like. As deployed, depth barely enters our trajectory, so this drive cannot rank the two
+        depths inside our SLAM.</li>
       <li><b>With ground truth (simulator):</b> our SLAM needs a scale free of slow drift: the true scale cuts the error 6.8&times;
         after loop closure (6.3&ndash;7.4&times; per session).</li>
     </ul>
@@ -344,7 +345,7 @@
   <div class="panel" style="margin-top:22px">
     <h3 style="margin-top:0">Depth, point by point: 1,000 points every method is scored on</h3>
     <p class="tip" style="margin:0 0 10px">Reference: three different stereo matchers on the same infrared pair must agree within
-      2&nbsp;% + 1&nbsp;% per metre, between 0.3 and 3&nbsp;m. 1,000 such points, balanced across five distance bins from 309 frames, are
+      2&nbsp;% + 1&nbsp;% per metre, between 0.3 and 3&nbsp;m. 1,000 such points, stratified across five distance bins from 309 frames, are
       frozen once; every monocular model is scored on exactly these points, relative models with their scale (and shift) fitted
       on other points of the same frame. Stereo rows are agreement among matchers, not accuracy (method details below).</p>
     <div class="table-scroll"><table><thead><tr><th>Depth source</th><th>Runs on</th><th class="n">AbsRel · per frame</th><th class="n">&delta;1</th><th class="n">AbsRel · one scale per drive</th><th class="n">Raw metric: pred / true</th></tr></thead><tbody>
@@ -377,15 +378,16 @@
         &minus;0.060 to +0.118, p&nbsp;=&nbsp;0.70; with 10-s blocks of the drive as the unit &minus;0.033 to +0.077; on |log(predicted/true)| +0.009,
         CI &minus;0.012 to +0.032). Here the interval excludes an advantage as large as the simulator's (0.269 vs 0.354 all-pixel
         AbsRel on held-out frames of the yard the student was fine-tuned on, a different metric);
-        on the set rebuilt without Fast-FoundationStereo it does not (ours &minus;0.061, CI &minus;0.132 to +0.001, carried by the
-        zoo model's blow-ups; on |log| the two tie).</li>
+        on the set rebuilt without Fast-FoundationStereo it does not (ours &minus;0.061, block p&nbsp;=&nbsp;0.081, carried by the
+        zoo model's blow-ups; on |log| not resolved, CI &minus;0.030 to +0.017).</li>
       <li><b>On obstacles the simulator's advantage is not shown.</b> On points at least 0.15&nbsp;m above each frame's floor plane
         (trunks, benches, bushes, people; 319 points, 87 frames; a stratum added after the main result, at a review's request),
         scored on |log(predicted/true)| because a few blow-ups rule the mean there, ours leans ahead of the zoo model by &minus;0.165
         (frames as units p&nbsp;=&nbsp;0.012; with 10-s blocks p&nbsp;=&nbsp;0.041, about 0.12 after correcting for the five tests on this
         metric), and by &minus;0.123 on the D435 + SGBM consensus (blocks p&nbsp;=&nbsp;0.056). The median error is not lower (0.232 vs 0.240,
         untested), and with one scale per drive ours is worse on the D435 + SGBM obstacle set (+0.334, blocks p&nbsp;=&nbsp;0.036).
-        Depth Anything V2-L and 3-L are better than ours on obstacles, by 0.153 and 0.184.</li>
+        Depth Anything V2-L and 3-L are better than ours on obstacles, by 0.153 and 0.184 in log error, and MoGe-3 and Depth Pro
+        by 0.21 and 0.23 in AbsRel.</li>
       <li><b>Against the rest.</b> Ours beats the other three edge builds (our int8 DAv2-S, SC-DepthV3, FastDepth; p&nbsp;&lt;&nbsp;0.001,
         the last two get a median scale only) and trails its GPU teacher by 0.092 (paired 0.085, CI 0.047&ndash;0.141). Aligned
         per frame, the GPU metric models score 0.20&ndash;0.22, better than ours but not resolvably. Live on the car it is 0.004 worse
@@ -421,7 +423,7 @@
     </div>
     <ul class="rw-notes" style="margin-top:14px">
       <li><b>As deployed, depth barely enters our trajectory.</b> Our stack measured the drive 2.3&times; too short: a plausibility gate
-        in its camera odometry rejected any motion faster than the <em>simulated</em> car's top speed, throwing away 23&nbsp;% of frames,
+        in its camera odometry rejected any motion faster than 1.5&times; the <em>simulated</em> car's top speed (1.08&nbsp;m/s), throwing away 23&nbsp;% of frames,
         exactly the fast ones (the odometry's own 90th-percentile speed on this drive is 2.9&nbsp;m/s). A physical bound fixes the scale
         (path within 8&nbsp;% of RTAB-Map's, the only check of the reference's scale that shares none of its inputs) but not the shape:
         skill falls to &minus;0.38&hellip;&minus;0.62, worse than the commands alone (&minus;0.31). Uncorrected roll is the prime suspect, not yet
