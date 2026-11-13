@@ -305,14 +305,14 @@
   <figure class="figure" style="margin-top:0">
     <video src="assets/realworld/drive.mp4" controls playsinline muted preload="metadata" poster="assets/realworld/drive_poster.jpg"
       style="width:100%;border-radius:14px;display:block;background:#0b0e10"></video>
-    <figcaption>Both panels follow the drive from the same reference poses, behind the car's real 3-D model, so only the
+    <figcaption>Both panels follow the drive from the same reference poses (RTAB-Map's position and heading), behind the car's real 3-D model, so only the
       depth differs. Each map is that source's own depth turned into a colour point cloud (left: the RealSense stereo; right: our
       network, at the scale the car itself uses), coloured by the camera and growing as the car drives; where the depths disagree,
       the maps differ. The cone ahead of the car is its camera's view with the live frame on it; cyan lines are this frame's
       pseudo-lidar rays. Header: the median range gap between the two scans for obstacles beyond 1&nbsp;m, ray by ray (both ranges
-      from ground-contact geometry), and how much of the view each source calls blocked. Red ticks: moments the stereo went blind in direct sun. The video closes on a
-      bird's-eye view of each source's whole map, a stretch of the park as a 3D Gaussian splat (from the colour camera alone, a picture of the place rather than part of the comparison), then every SLAM method against the reference and the 1,000-point depth
-      benchmark. People are blurred, and kept out of the point clouds.</figcaption>
+      from ground-contact geometry), and how much of the view each source calls blocked. The stereo went blind in direct sun on 0.1% of frames (footer). The video closes on a
+      bird's-eye view of each source's whole map, a stretch of the park as a 3D Gaussian splat (from the colour camera alone, a picture of the place rather than part of the comparison), then every SLAM method against the reference, the 1,000-point depth
+      benchmark and the three headline numbers. People are blurred, and kept out of the point clouds.</figcaption>
   </figure>
   <div class="panel" style="margin-top:22px">
     <div class="chart-head"><h3>Where each method thinks the car went</h3></div>
