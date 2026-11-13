@@ -302,7 +302,7 @@
   </style>
   <div class="section-heading">
     <p class="eyebrow">Real world · new</p>
-    <h2 id="realworld-title">On a real drive our chip network ties the vendor's depth model and makes fewer large errors on obstacles. SLAM's weak link is our odometry, not the depth.</h2>
+    <h2 id="realworld-title">One real drive: our chip network is not resolvably different from the vendor's depth model.</h2>
     <p>One drive by hand through a sunlit park, recording everything: the colour camera, the RealSense D435's on-chip stereo
       depth and both of its infrared images, and the depth our student computed on the Hailo-8L, frame by frame (219&nbsp;s).
       There is no ground truth on this drive, so every real number below is agreement with an independent reference; questions
@@ -310,8 +310,9 @@
     <ul class="glance">
       <li><b>Depth:</b> on 1,000 points where three stereo matchers agree, ours scores AbsRel 0.262 and the Hailo Model Zoo's
         Depth Anything V2-S 0.234: a difference within noise (95&nbsp;% CI &minus;0.060 to +0.118).</li>
-      <li><b>Obstacles:</b> on 319 points that rise above the ground, ours makes fewer large errors than the zoo model (log error
-        &minus;0.165, p&nbsp;=&nbsp;0.012; replicated without the third matcher), with the same typical error.</li>
+      <li><b>Obstacles:</b> on 319 points that rise above the ground, ours leans toward fewer large errors than the zoo model (log
+        error &minus;0.165; p&nbsp;=&nbsp;0.041 with 10-s blocks as the unit, not significant after correcting for multiple tests; median not
+        lower, 0.232 vs 0.240). With one scale per drive it is worse on the two-matcher set (+0.334).</li>
       <li><b>Range:</b> beyond 1&nbsp;m the network places obstacle bases within a median 25&nbsp;% of the RealSense.</li>
       <li><b>SLAM:</b> independent systems agree with the reference (VGGT-SLAM 2.0 skill +0.80); ours scores &minus;0.11 as
         deployed and the commands alone &minus;0.31. The camera odometry, not the depth, is what fails.</li>
