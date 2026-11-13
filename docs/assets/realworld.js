@@ -2,6 +2,10 @@
 (function () {
   const svg = document.getElementById("rw-chart"), tip = document.getElementById("rw-tip");
   const rows = document.getElementById("rw-rows"), legend = document.getElementById("rw-legend");
+  const sgn = v => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(2);
+  // a method run several times shows its mean ± sd, never its best run alone
+  const skillText = (t, D) => { const r = (D.repeats || {})[t.key];
+    return r && r.n > 1 && t.key !== D.reference ? `${sgn(r.skill_mean)} ± ${r.skill_sd.toFixed(2)} (${r.n} runs)` : sgn(t.skill); };
   if (!svg) return;
   const NS = "http://www.w3.org/2000/svg";
   // validated on the panel surface #171a1b (dataviz validator: all checks pass); fixed order by role
@@ -75,7 +79,7 @@
       if (partial) tr.className = (tr.className + " partial").trim();
       [t.label + (mono ? " · scale given by alignment" : "") + (partial ? " · partial" : ""),
        Math.round(t.coverage * 100) + " % (" + t.seconds_tracked.toFixed(0) + " s)",
-       ref ? "–" : (t.skill >= 0 ? "+" : "") + t.skill.toFixed(2),
+       ref ? "–" : skillText(t, D),
        ref ? "reference" : t.rms_m.toFixed(2) + " m", ref ? "–" : t.p90_m.toFixed(2) + " m",
        mono ? "–" : t.path_m.toFixed(1) + " m", mono ? "n/a" : t.path_ratio.toFixed(2)]
         .forEach((c, i) => { const td = document.createElement("td"); td.textContent = c; if (i) td.className = "n"; tr.appendChild(td); });
