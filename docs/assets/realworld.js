@@ -72,8 +72,8 @@
         visible[t.key] = !visible[t.key]; li.setAttribute("aria-pressed", String(visible[t.key]));
         lines[t.key].setAttribute("visibility", visible[t.key] ? "visible" : "hidden");
       });
-      legend.appendChild(li);
-      const tr = document.createElement("tr"); if (t.role === "ours") tr.className = "ours";
+      if (!/_no_match|_realgate|_dead_reckoning/.test(t.key) || t.key === "ours_hailo_dead_reckoning") legend.appendChild(li);
+      const tr = document.createElement("tr"); if (t.role === "deployed") tr.className = "ours";   // highlight = ours as deployed (orange everywhere)
       const ref = t.key === D.reference;
       const mono = t.scale_given_by_alignment;   // monocular: no metric scale, so the alignment supplies it
       const partial = t.coverage < 0.5;
@@ -106,6 +106,6 @@
     hit.addEventListener("mousemove", show); hit.addEventListener("mouseleave", hide);
     hit.addEventListener("touchmove", e => { show(e.touches[0]); e.preventDefault(); }, { passive: false });
     document.getElementById("rw-meta").textContent =
-      `${D.seconds.toFixed(0)} s of driving, ${D.ref_path_m.toFixed(0)} m along the reference path. All tracks rigidly aligned (rotation + translation, no scale) to the reference.`;
+      `${D.seconds.toFixed(0)} s of driving, ${D.ref_path_m.toFixed(0)} m along the reference path. Metric methods are aligned rigidly (rotation + translation); monocular ones also get a scale ("scale given by alignment").`;
   });
 })();
