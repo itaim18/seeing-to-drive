@@ -300,7 +300,9 @@
       (219&nbsp;s recorded; the SLAM window, from the first stereo frame, is 216&nbsp;s). There is no ground truth on this drive.
       The yardstick is an <em>independent</em> metric system, RTAB-Map run on the RealSense's own infrared image and stereo
       depth: one graph over 97&nbsp;% of the drive, with four loop closures and 47 odometry resets. Every SLAM score below is
-      agreement with it, not accuracy, from one drive; one run per method except ORB-SLAM3 stereo, DROID and VGGT (three runs each).</p>
+      agreement with it, not accuracy, from one drive; one run per method except ORB-SLAM3 stereo, DROID and VGGT (three runs each).
+      The reference itself repeats to 0.64&ndash;0.79&nbsp;m RMS (a second run, and two with the camera's factory intrinsics); scored
+      against any of those four runs, no method's skill moves by more than 0.06 and no ranking changes.</p>
   </div>
   <figure class="figure" style="margin-top:0">
     <video src="assets/realworld/drive.mp4" controls playsinline muted preload="metadata" poster="assets/realworld/drive_poster.jpg"
@@ -351,19 +353,19 @@
     <h3 style="margin-top:0">What this drive shows</h3>
     <ul class="rw-notes">
       <li><b>Beyond 1&nbsp;m the network places obstacle bases within a median 25&nbsp;% of the RealSense; on grass, both stumble.</b> From the same poses, where both
-        see an obstacle beyond 1&nbsp;m, the network's range is within 25&nbsp;% of the stereo's (median over 819 frames of each frame's ray-by-ray gap; 28&nbsp;% pooled over all 34,227 rays).
+        see an obstacle beyond 1&nbsp;m, the network's range is within 25&nbsp;% of the stereo's (median over 931 frames of each frame's ray-by-ray gap; 29&nbsp;% pooled over all 28,616 rays).
         Both ranges come from ground-contact geometry and the camera height, so this compares where each source puts an
         obstacle's base; it is similar in size to the benchmark's AbsRel below, though a different quantity. Inside 1&nbsp;m, both mark grass as obstacles, in different places. From 16&nbsp;cm
-        the stereo resolves single tufts and marks 76&nbsp;% of image columns blocked. The network marks 41&nbsp;%, and sometimes
+        the stereo resolves single tufts and marks 63&nbsp;% of image columns blocked. The network marks 41&nbsp;%, and sometimes
         draws a false band across motion-blurred lawn. Neither is right on grass, which this car drives straight over.</li>
       <li><b>Our onboard odometry is the weak link, not the depth.</b> As deployed, our stack measured the drive 2.3&times; too short.
         The cause: a plausibility gate in its camera odometry rejected any motion faster than the <em>simulated</em> car's top
         speed. That threw away 23&nbsp;% of frames, exactly the fast ones, since the real car reaches about 2.9&nbsp;m/s. Opening the gate
         to a physical bound fixes the scale (path within 8&nbsp;% of RTAB-Map's, the only check of the reference's scale that shares
         none of its inputs)
-        but not the shape: skill falls to &minus;0.39&hellip;&minus;0.62, worse than the commands alone (&minus;0.31). Uncorrected roll
+        but not the shape: skill falls to &minus;0.38&hellip;&minus;0.62, worse than the commands alone (&minus;0.31). Uncorrected roll
         is the prime suspect, not yet isolated. The depth hardly matters: with that gate, the odometry alone scores &minus;0.615 and
-        with the scan match &minus;0.618. (As deployed, network vs RealSense depth score &minus;0.11 vs +0.12, but on different frame
+        with the scan match &minus;0.618. (As deployed, network vs RealSense depth score &minus;0.11 vs +0.03, but on different frame
         sets, so that gap is not attributed to depth.) A gyro heading from an IMU on the same bus is the planned, untested fix.</li>
       <li><b>Independent systems agree with the reference.</b> VGGT-SLAM 2.0 (2026, monocular) agrees with it at skill +0.80 (bit-identical over three runs),
         spanning 99&nbsp;% of the drive with 351 keyframes (gaps interpolated). ORB-SLAM3 on the RealSense stereo pair or RGB-D scores
@@ -389,32 +391,33 @@
     <h3 style="margin-top:0">Depth, point by point: 1,000 points every method is scored on</h3>
     <p style="color:var(--muted)">No lidar on the car, so the reference is three different stereo matchers on the same infrared pair (the
       D435's chip, OpenCV SGBM and Fast-FoundationStereo). They must agree within 2&nbsp;% + 1&nbsp;% per metre, between 0.3 and 3&nbsp;m. They
-      share the images, the rectification and the nominal calibration, so a common-mode calibration error would not show.
+      share the images and the rectification, so a common-mode error there would not show. Points are placed in the colour image
+      with the D435's factory calibration, read from the unit after the drive.
       Fast-FoundationStereo is distilled from a backbone with Depth Anything V2 features, but all three must agree, so it can only
-      veto a point. The 1,000 points are balanced across five distance bins from 317 frames, inside the region every model sees,
+      veto a point. The 1,000 points are balanced across five distance bins from 309 frames, inside the region every model sees,
       and every monocular model is scored on exactly these points. Relative models get their scale (and shift) fitted on other
       points of the same frame, never the scored ones. A stereo matcher is scored only against the other two, on its own points
       in the infrared frame with its holes excluded: agreement among matchers, not comparable with the networks.</p>
     <div class="table-scroll"><table><thead><tr><th>Depth source</th><th>Runs on</th><th class="n">AbsRel · per frame</th><th class="n">&delta;1</th><th class="n">AbsRel · one scale per drive</th><th class="n">Raw metric: pred / true</th></tr></thead><tbody>
-<tr><td>Depth Anything 3-Large</td><td>GPU</td><td class="n">0.139</td><td class="n">0.81</td><td class="n">0.416</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything 3-Base</td><td>GPU</td><td class="n">0.143</td><td class="n">0.78</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything 3-Small</td><td>GPU</td><td class="n">0.146</td><td class="n">0.78</td><td class="n">0.393</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything 3-Mono-Large</td><td>GPU</td><td class="n">0.146</td><td class="n">0.80</td><td class="n">0.396</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything V2-S</td><td>GPU</td><td class="n">0.225</td><td class="n">0.79</td><td class="n">0.430</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything V2-B</td><td>GPU</td><td class="n">0.231</td><td class="n">0.79</td><td class="n">0.428</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything V2-L (teacher)</td><td>GPU</td><td class="n">0.235</td><td class="n">0.78</td><td class="n">0.426</td><td class="n">&ndash;</td></tr>
-<tr><td>MoGe-3</td><td>GPU</td><td class="n">0.256</td><td class="n">0.58</td><td class="n">0.298</td><td class="n">&times;3.4</td></tr>
-<tr><td>Ours, replayed on the chip</td><td>Hailo-8L int8</td><td class="n">0.265</td><td class="n">0.69</td><td class="n">0.486</td><td class="n">&ndash;</td></tr>
-<tr><td>DAv2-S, Hailo Model Zoo</td><td>Hailo-8L int8</td><td class="n">0.265</td><td class="n">0.71</td><td class="n">0.431</td><td class="n">&ndash;</td></tr>
-<tr><td>Ours, float twin</td><td>GPU</td><td class="n">0.267</td><td class="n">0.69</td><td class="n">0.489</td><td class="n">&ndash;</td></tr>
-<tr><td>MoGe-2</td><td>GPU</td><td class="n">0.268</td><td class="n">0.55</td><td class="n">0.309</td><td class="n">&times;3.2</td></tr>
-<tr class="ours"><td><b>Ours: distilled student v5, live on the car</b></td><td>Hailo-8L int8</td><td class="n">0.271</td><td class="n">0.68</td><td class="n">0.488</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything 3-Metric-Large</td><td>GPU</td><td class="n">0.309</td><td class="n">0.56</td><td class="n">0.386</td><td class="n">&times;2.3</td></tr>
-<tr><td>Depth Pro</td><td>GPU</td><td class="n">0.332</td><td class="n">0.56</td><td class="n">0.501</td><td class="n">&times;2.0</td></tr>
-<tr><td>UniDepthV2-L</td><td>GPU</td><td class="n">0.346</td><td class="n">0.57</td><td class="n">0.397</td><td class="n">&times;1.7</td></tr>
-<tr><td>SC-DepthV3, Hailo Model Zoo</td><td>Hailo-8L int8</td><td class="n">0.394</td><td class="n">0.24</td><td class="n">0.436</td><td class="n">&ndash;</td></tr>
-<tr><td>DAv2-S, our int8 build</td><td>Hailo-8L int8</td><td class="n">0.399</td><td class="n">0.53</td><td class="n">0.440</td><td class="n">&ndash;</td></tr>
-<tr><td>FastDepth, Hailo Model Zoo</td><td>Hailo-8L int8</td><td class="n">0.426</td><td class="n">0.22</td><td class="n">0.439</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything 3-Large</td><td>GPU</td><td class="n">0.101</td><td class="n">0.90</td><td class="n">0.418</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything 3-Mono-Large</td><td>GPU</td><td class="n">0.107</td><td class="n">0.88</td><td class="n">0.359</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything 3-Base</td><td>GPU</td><td class="n">0.110</td><td class="n">0.87</td><td class="n">0.408</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything 3-Small</td><td>GPU</td><td class="n">0.115</td><td class="n">0.86</td><td class="n">0.390</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything V2-S</td><td>GPU</td><td class="n">0.160</td><td class="n">0.82</td><td class="n">0.427</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything V2-L (teacher)</td><td>GPU</td><td class="n">0.170</td><td class="n">0.84</td><td class="n">0.422</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything V2-B</td><td>GPU</td><td class="n">0.181</td><td class="n">0.83</td><td class="n">0.426</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Pro</td><td>GPU</td><td class="n">0.202</td><td class="n">0.65</td><td class="n">0.402</td><td class="n">&times;2.0</td></tr>
+<tr><td>MoGe-3</td><td>GPU</td><td class="n">0.205</td><td class="n">0.62</td><td class="n">0.261</td><td class="n">&times;3.5</td></tr>
+<tr><td>MoGe-2</td><td>GPU</td><td class="n">0.207</td><td class="n">0.63</td><td class="n">0.262</td><td class="n">&times;3.3</td></tr>
+<tr><td>Depth Anything 3-Metric-Large</td><td>GPU</td><td class="n">0.222</td><td class="n">0.58</td><td class="n">0.297</td><td class="n">&times;2.4</td></tr>
+<tr><td>UniDepthV2-L</td><td>GPU</td><td class="n">0.222</td><td class="n">0.61</td><td class="n">0.305</td><td class="n">&times;1.7</td></tr>
+<tr><td>DAv2-S, Hailo Model Zoo</td><td>Hailo-8L int8</td><td class="n">0.234</td><td class="n">0.74</td><td class="n">0.432</td><td class="n">&ndash;</td></tr>
+<tr><td>Ours, replayed on the chip</td><td>Hailo-8L int8</td><td class="n">0.258</td><td class="n">0.74</td><td class="n">0.413</td><td class="n">&ndash;</td></tr>
+<tr><td>Ours, float twin</td><td>GPU</td><td class="n">0.258</td><td class="n">0.75</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
+<tr class="ours"><td><b>Ours: distilled student v5, live on the car</b></td><td>Hailo-8L int8</td><td class="n">0.262</td><td class="n">0.73</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
+<tr><td>SC-DepthV3, Hailo Model Zoo</td><td>Hailo-8L int8</td><td class="n">0.392</td><td class="n">0.22</td><td class="n">0.435</td><td class="n">&ndash;</td></tr>
+<tr><td>FastDepth, Hailo Model Zoo</td><td>Hailo-8L int8</td><td class="n">0.394</td><td class="n">0.23</td><td class="n">0.415</td><td class="n">&ndash;</td></tr>
+<tr><td>DAv2-S, our int8 build</td><td>Hailo-8L int8</td><td class="n">0.443</td><td class="n">0.58</td><td class="n">0.439</td><td class="n">&ndash;</td></tr>
 <tr class="sep"><td colspan="6" style="color:var(--soft)">Stereo, below: each matcher scored leave-one-out against the other two, on its own points in the infrared frame, holes excluded. Agreement among matchers on the same images, not comparable with the rows above.</td></tr>
 <tr><td>RealSense D435 on-chip stereo <span style="color:var(--soft)">(no depth on 5% of points)</span></td><td>stereo</td><td class="n">0.009</td><td class="n">1.00</td><td class="n">&ndash;</td><td class="n">metric</td></tr>
 <tr><td>OpenCV SGBM on the IR pair <span style="color:var(--soft)">(no depth on 17% of points)</span></td><td>stereo</td><td class="n">0.010</td><td class="n">1.00</td><td class="n">&ndash;</td><td class="n">metric</td></tr>
@@ -422,24 +425,34 @@
 </tbody></table></div>
     <ul class="rw-notes" style="margin-top:14px">
       <li><b>On the chip, our student is indistinguishable from the Hailo Model Zoo's Depth Anything V2-S on these points</b>
-        (difference +0.008, 95&nbsp;% CI &minus;0.026 to +0.039, p&nbsp;=&nbsp;0.67). The interval rules out an advantage for ours larger than
-        0.026 (0.071 on the set rebuilt without Fast-FoundationStereo), so the simulator's advantage (0.269 vs 0.354, on held-out frames of the yard it was fine-tuned on) is absent on these
-        mostly-ground points. On a separate obstacle stratum (points at least 0.15&nbsp;m above each frame's floor plane: trunks, benches, bushes, people; 358 points, 95 frames), scored on the symmetric |log(predicted/true)| because a few blow-ups rule the mean there, ours leans the simulator's way against the zoo model (&minus;0.065, CI &minus;0.137 to +0.001, p&nbsp;=&nbsp;0.07): not resolved. Depth Anything 3 Large is better on obstacles by 0.154. Without Fast-FoundationStereo (D435 + SGBM only, a new 1,000-point
-        set) the sign flips (&minus;0.023, CI &minus;0.071 to +0.020): still indistinguishable. It beats the other three edge builds (our int8 DAv2-S, SC-DepthV3, FastDepth)
-        (p&nbsp;&lt;&nbsp;0.001; SC-DepthV3 and FastDepth get a median scale only) and trails its GPU teacher by 0.036 (paired 0.042,
-        CI 0.016&ndash;0.067; without Fast-FoundationStereo +0.025, CI &minus;0.012 to +0.058, not resolved). On the three-matcher set,
-        live on the car it is 0.005 worse than its own chip replay (CI 0.001&ndash;0.010).</li>
-      <li><b>Metric foundation models misjudge scale from 16&nbsp;cm.</b> All of them overestimate distance here, by 1.7&times; (UniDepthV2)
-        to 3.4&times; (MoGe-3), plausibly because they were trained on human-height cameras. With one scale for the whole drive, fitted
-        on this drive's own points, MoGe-3 still beats every relative network, and our three builds have the highest one-scale error
-        (0.486&ndash;0.489 vs 0.393&ndash;0.440), though against the zoo DAv2-S the paired difference is not resolved (+0.020, CI
-        &minus;0.044 to +0.097). Every strong relative network loses 0.17&ndash;0.28 under one scale per drive (ours 0.22): relative
+        (difference +0.017, 95&nbsp;% CI &minus;0.060 to +0.118, p&nbsp;=&nbsp;0.70; on |log(predicted/true)| +0.009, CI &minus;0.012 to +0.032).
+        The interval rules out an advantage for ours larger than 0.060, so the simulator's advantage (0.269 vs 0.354, on held-out
+        frames of the yard it was fine-tuned on) is absent on these mostly-ground points. <b>On obstacles, the simulator's direction
+        returns:</b> on a separate stratum (points at least 0.15&nbsp;m above each frame's floor plane: trunks, benches, bushes, people;
+        319 points, 87 frames), scored on |log(predicted/true)| because a few blow-ups rule the mean there, ours beats the zoo model
+        by &minus;0.165 (CI &minus;0.290 to &minus;0.050, p&nbsp;=&nbsp;0.012), an advantage in the tail (median error 0.232 vs 0.240).
+        Depth Anything V2-L and 3-L are better than ours on obstacles, by 0.153 and 0.184. Without Fast-FoundationStereo (D435 + SGBM
+        only, a new 1,000-point set) the mean leans our way (&minus;0.061, CI &minus;0.132 to +0.001, p&nbsp;=&nbsp;0.07), carried by
+        the zoo model's blow-ups; on |log| the two tie. It beats the other three edge builds (our int8 DAv2-S, SC-DepthV3, FastDepth)
+        (p&nbsp;&lt;&nbsp;0.001; SC-DepthV3 and FastDepth get a median scale only) and trails its GPU teacher by 0.092 (paired 0.085,
+        CI 0.047&ndash;0.141; without Fast-FoundationStereo +0.028, CI &minus;0.013 to +0.066, not resolved). On the three-matcher set,
+        live on the car it is 0.004 worse than its own chip replay (CI 0.001&ndash;0.006).</li>
+      <li><b>Metric foundation models misjudge scale from 16&nbsp;cm.</b> Raw, all of them overestimate distance here, by 1.7&times;
+        (UniDepthV2) to 3.5&times; (MoGe-3), plausibly because they were trained on human-height cameras. Aligned per frame they score
+        0.20&ndash;0.22, better than ours but not resolvably. With one scale for the whole drive, fitted on this drive's own points,
+        MoGe-3 and MoGe-2 (0.26) beat every relative network (0.36&ndash;0.43); ours is at 0.410, against the zoo DAv2-S &minus;0.040
+        (CI &minus;0.106 to +0.061). Every relative network loses 0.15&ndash;0.32 under one scale per drive (ours 0.15): relative
         output scale moves from frame to frame. Relative networks need a per-frame scale;
         our robot takes it from the camera's known height, which this benchmark does not score.</li>
+      <li><b>The factory calibration changed these numbers.</b> A first version placed the points with the datasheet's nominal
+        calibration, which misplaces every point by a median 14.5&nbsp;px. The factory values put depth edges 6.7&nbsp;px from the colour
+        image's edges against 12.0&nbsp;px (closer on all 20 frames that could be scored). On the same physical points they cut every
+        network's error by 10&ndash;57&nbsp;% while the stereo scores do not move. Sharp GPU models gained most; the nominal results are
+        kept in the repository as a record.</li>
       <li><b>The stereo rows are agreement, not accuracy.</b> Each matcher is scored against the other two on its own points, so
         its 1&ndash;4&nbsp;% cannot be set against the networks' numbers. The points are where stereo works by construction; sky, glare
         and objects closer than its minimum range are not in this set.</li>
-      <li>FastDepth's outputs on the chip are poor outdoors (an indoor-trained model). Calibration is nominal until the factory read.</li>
+      <li>FastDepth's outputs on the chip are poor outdoors (an indoor-trained model).</li>
     </ul>
   </div>
 </section>
