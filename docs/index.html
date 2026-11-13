@@ -327,7 +327,8 @@
       network, at the scale the car itself uses), growing as the car drives; where the depths disagree, the maps differ. The cone
       ahead of the car is its camera's view with the live frame on it; cyan lines are this frame's pseudo-lidar rays. Header: the
       median range gap between the two scans for obstacles beyond 1&nbsp;m, ray by ray. The video closes on each source's whole map,
-      a stretch of the park as a 3D Gaussian splat (a picture of the place, not part of the comparison), every SLAM method against
+      a stretch of the park as a 3D Gaussian splat (trained on the colour images with the RealSense depth as a geometry prior
+      within 3&nbsp;m: a picture of the place, not part of the comparison), every SLAM method against
       the reference, the depth benchmark and the three headline numbers. People are blurred, and kept out of the point clouds.</figcaption>
   </figure>
 
