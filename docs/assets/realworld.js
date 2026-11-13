@@ -5,7 +5,7 @@
   const sgn = v => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(2);
   // a method run several times shows its mean ± sd, never its best run alone
   const skillText = (t, D) => { const r = (D.repeats || {})[t.key];
-    return r && r.n > 1 && t.key !== D.reference ? `${sgn(r.skill_mean)} ± ${r.skill_sd.toFixed(2)} (${r.n} runs)` : sgn(t.skill); };
+    return r && r.n > 1 && t.key !== D.reference ? `${sgn(r.skill_mean)} ± ${(r.skill_sd + 1e-9).toFixed(2)} (${r.n} runs)` : sgn(t.skill); };
   if (!svg) return;
   const NS = "http://www.w3.org/2000/svg";
   // validated on the panel surface #171a1b (dataviz validator: all checks pass); fixed order by role
