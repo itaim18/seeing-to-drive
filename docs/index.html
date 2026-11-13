@@ -298,6 +298,7 @@
     #realworld .glance { margin: 14px 0 0; padding: 0 0 0 20px; }
     #realworld .glance li { margin: 6px 0; }
     #realworld details { margin-top: 22px; }
+    #realworld .on { display: none; color: var(--soft); }
     #realworld summary { cursor: pointer; font-weight: 600; }
     @media (max-width: 600px) {
       #realworld table { min-width: 0; width: 100%; }
@@ -309,6 +310,9 @@
       /* phone: the name and the headline number only; the full tables are on desktop */
       #realworld table.bench th:nth-child(2), #realworld table.bench td:nth-child(2):not([colspan]),
       #realworld table.bench th:nth-child(n+4), #realworld table.bench td:nth-child(n+4) { display: none; }
+      #realworld .on { display: inline; }
+      #realworld table.hitl th:nth-child(3), #realworld table.hitl td:nth-child(3):not([colspan]),
+      #realworld table.hitl th:nth-child(5), #realworld table.hitl td:nth-child(5) { display: none; }
       #realworld table:has(#rw-rows) th:nth-child(2), #realworld #rw-rows td:nth-child(2),
       #realworld table:has(#rw-rows) th:nth-child(n+4), #realworld #rw-rows td:nth-child(n+4) { display: none; }
       #realworld h2 { font-size: 1.5rem; }
@@ -324,16 +328,14 @@
     <ul class="glance">
       <li><b>Depth:</b> on 1,000 points where three stereo matchers agree, ours scores AbsRel 0.262 and the Hailo Model Zoo's
         Depth Anything V2-S 0.234: not resolvably different (95&nbsp;% CI &minus;0.060 to +0.118).</li>
-      <li><b>Obstacles:</b> the simulator's advantage is not shown on 319 points that rise above the ground (a post-hoc,
-        exploratory lean on log error: block p&nbsp;=&nbsp;0.046, 0.046&ndash;0.14 after correction depending on the test family; with
-        one scale per drive ours is worse on the two-matcher set, equally exploratory).</li>
-      <li><b>Range:</b> beyond 1&nbsp;m the network places obstacle bases within a median 25&nbsp;% of the RealSense.</li>
-      <li><b>SLAM:</b> independent systems agree with the reference (VGGT-SLAM 2.0 skill +0.80); ours scores &minus;0.11 as
-        deployed and the commands alone &minus;0.31; under the alignment the monocular methods get, +0.10 vs +0.08, a 0.02 difference
-        from one run: not evidence of a lead. As deployed, depth barely enters our trajectory, so this drive cannot rank the two
-        depths inside our SLAM.</li>
+      <li><b>Obstacles:</b> the simulator's advantage is not shown (an exploratory lean, not significant after correction;
+        details below).</li>
+      <li><b>Range:</b> beyond 1&nbsp;m the network's obstacle range is within a median 25&nbsp;% of the RealSense's
+        (signed &minus;7&nbsp;%: a little nearer).</li>
+      <li><b>SLAM:</b> VGGT-SLAM 2.0 agrees with the independent reference (skill +0.80); ours +0.10, the commands alone +0.08
+        (same scale-fitting alignment). As deployed, depth barely enters our trajectory.</li>
       <li><b>With ground truth (simulator):</b> our SLAM needs a better scale than its per-frame floor fit: the true scale cuts the
-        error 6.8&times; after loop closure (6.3&ndash;7.4&times; per session); smoothing the floor fit does not help.</li>
+        error 6.8&times; after loop closure (6.3&ndash;7.4&times; per session); smoothing the floor fit does not reliably help.</li>
     </ul>
   </div>
   <figure class="figure" style="margin-top:0">
@@ -345,9 +347,7 @@
       ahead of the car is its camera's view with the live frame on it; cyan lines are this frame's pseudo-lidar rays. The line under
       the maps is the median range gap between the two scans for obstacles beyond 1&nbsp;m (and whether the network reads farther or
       nearer); the timeline carries each frame's gap. Then: each source's whole map, the obstacles each depth marks seen from
-      above, every SLAM method against the reference, the depth benchmark with its intervals, the headline numbers, and a coda: a
-      stretch of the park as a 3D Gaussian splat (colour images with the RealSense depth as a geometry prior within 3&nbsp;m; a
-      picture of the place, not part of the comparison). People are blurred, and kept out of the point clouds.</figcaption>
+      above, every SLAM method against the reference, the depth benchmark with its intervals, and the headline numbers; the Gaussian splat of the park is its own clip below. People are blurred, and kept out of the point clouds. On a phone, watch it full-screen in landscape.</figcaption>
   </figure>
 
   <div class="panel" style="margin-top:22px">
@@ -357,25 +357,25 @@
       frozen once; every monocular model is scored on exactly these points, relative models with their scale (and shift) fitted
       on other points of the same frame. Stereo rows are agreement among matchers, not accuracy (method details below).</p>
     <div class="table-scroll"><table class="bench"><thead><tr><th>Depth source</th><th>Runs on</th><th class="n">AbsRel · per frame</th><th class="n">&delta;1</th><th class="n">AbsRel · one scale per drive</th><th class="n">Raw metric: pred / true</th></tr></thead><tbody>
-<tr><td>Depth Anything 3-Large</td><td>GPU</td><td class="n">0.101</td><td class="n">0.90</td><td class="n">0.418</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything 3-Mono-Large</td><td>GPU</td><td class="n">0.107</td><td class="n">0.88</td><td class="n">0.359</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything 3-Base</td><td>GPU</td><td class="n">0.110</td><td class="n">0.87</td><td class="n">0.408</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything 3-Small</td><td>GPU</td><td class="n">0.115</td><td class="n">0.86</td><td class="n">0.390</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything V2-S</td><td>GPU</td><td class="n">0.160</td><td class="n">0.82</td><td class="n">0.427</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything V2-L (teacher)</td><td>GPU</td><td class="n">0.170</td><td class="n">0.84</td><td class="n">0.422</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything V2-B</td><td>GPU</td><td class="n">0.181</td><td class="n">0.83</td><td class="n">0.426</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Pro</td><td>GPU</td><td class="n">0.202</td><td class="n">0.65</td><td class="n">0.402</td><td class="n">&times;2.0</td></tr>
-<tr><td>MoGe-3</td><td>GPU</td><td class="n">0.205</td><td class="n">0.62</td><td class="n">0.261</td><td class="n">&times;3.5</td></tr>
-<tr><td>MoGe-2</td><td>GPU</td><td class="n">0.207</td><td class="n">0.63</td><td class="n">0.262</td><td class="n">&times;3.3</td></tr>
-<tr><td>Depth Anything 3-Metric-Large</td><td>GPU</td><td class="n">0.222</td><td class="n">0.58</td><td class="n">0.297</td><td class="n">&times;2.4</td></tr>
-<tr><td>UniDepthV2-L</td><td>GPU</td><td class="n">0.222</td><td class="n">0.61</td><td class="n">0.305</td><td class="n">&times;1.7</td></tr>
-<tr><td>DAv2-S, Hailo Model Zoo <span style="color:var(--soft)">(the comparison)</span></td><td>Hailo-8L int8</td><td class="n">0.234</td><td class="n">0.74</td><td class="n">0.432</td><td class="n">&ndash;</td></tr>
-<tr><td>Ours, replayed on the chip</td><td>Hailo-8L int8</td><td class="n">0.258</td><td class="n">0.74</td><td class="n">0.413</td><td class="n">&ndash;</td></tr>
-<tr><td>Ours, float twin</td><td>GPU</td><td class="n">0.258</td><td class="n">0.75</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
-<tr class="ours"><td><b>Ours: distilled student v5, live on the car</b></td><td>Hailo-8L int8</td><td class="n">0.262</td><td class="n">0.73</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
-<tr><td>SC-DepthV3, Hailo Model Zoo</td><td>Hailo-8L int8</td><td class="n">0.392</td><td class="n">0.22</td><td class="n">0.435</td><td class="n">&ndash;</td></tr>
-<tr><td>FastDepth, Hailo Model Zoo</td><td>Hailo-8L int8</td><td class="n">0.394</td><td class="n">0.23</td><td class="n">0.415</td><td class="n">&ndash;</td></tr>
-<tr><td>DAv2-S, our int8 build</td><td>Hailo-8L int8</td><td class="n">0.443</td><td class="n">0.58</td><td class="n">0.439</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything 3-Large<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.101</td><td class="n">0.90</td><td class="n">0.418</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything 3-Mono-Large<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.107</td><td class="n">0.88</td><td class="n">0.359</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything 3-Base<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.110</td><td class="n">0.87</td><td class="n">0.408</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything 3-Small<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.115</td><td class="n">0.86</td><td class="n">0.390</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything V2-S<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.160</td><td class="n">0.82</td><td class="n">0.427</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything V2-L (teacher)<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.170</td><td class="n">0.84</td><td class="n">0.422</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Anything V2-B<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.181</td><td class="n">0.83</td><td class="n">0.426</td><td class="n">&ndash;</td></tr>
+<tr><td>Depth Pro<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.202</td><td class="n">0.65</td><td class="n">0.402</td><td class="n">&times;2.0</td></tr>
+<tr><td>MoGe-3<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.205</td><td class="n">0.62</td><td class="n">0.261</td><td class="n">&times;3.5</td></tr>
+<tr><td>MoGe-2<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.207</td><td class="n">0.63</td><td class="n">0.262</td><td class="n">&times;3.3</td></tr>
+<tr><td>Depth Anything 3-Metric-Large<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.222</td><td class="n">0.58</td><td class="n">0.297</td><td class="n">&times;2.4</td></tr>
+<tr><td>UniDepthV2-L<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.222</td><td class="n">0.61</td><td class="n">0.305</td><td class="n">&times;1.7</td></tr>
+<tr><td>DAv2-S, Hailo Model Zoo <span style="color:var(--soft)">(the comparison)</span><span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.234</td><td class="n">0.74</td><td class="n">0.432</td><td class="n">&ndash;</td></tr>
+<tr><td>Ours, replayed on the chip<span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.258</td><td class="n">0.74</td><td class="n">0.413</td><td class="n">&ndash;</td></tr>
+<tr><td>Ours, float twin<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.258</td><td class="n">0.75</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
+<tr class="ours"><td><b>Ours: distilled student v5, live on the car</b><span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.262</td><td class="n">0.73</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
+<tr><td>SC-DepthV3, Hailo Model Zoo<span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.392</td><td class="n">0.22</td><td class="n">0.435</td><td class="n">&ndash;</td></tr>
+<tr><td>FastDepth, Hailo Model Zoo<span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.394</td><td class="n">0.23</td><td class="n">0.415</td><td class="n">&ndash;</td></tr>
+<tr><td>DAv2-S, our int8 build<span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.443</td><td class="n">0.58</td><td class="n">0.439</td><td class="n">&ndash;</td></tr>
 <tr class="sep"><td colspan="6" style="color:var(--soft)">Stereo, below: each matcher scored leave-one-out against the other two, on its own points in the infrared frame, holes excluded. Agreement among matchers on the same images, not comparable with the rows above.</td></tr>
 <tr><td>RealSense D435 on-chip stereo <span style="color:var(--soft)">(no depth on 5% of points)</span></td><td>stereo</td><td class="n">0.009</td><td class="n">1.00</td><td class="n">&ndash;</td><td class="n">metric</td></tr>
 <tr><td>OpenCV SGBM on the IR pair <span style="color:var(--soft)">(no depth on 17% of points)</span></td><td>stereo</td><td class="n">0.010</td><td class="n">1.00</td><td class="n">&ndash;</td><td class="n">metric</td></tr>
@@ -384,8 +384,9 @@
     <ul class="rw-notes" style="margin-top:14px">
       <li><b>Ours and the vendor's model are not resolvably different on these mostly-ground points</b> (difference +0.017, 95&nbsp;% CI
         &minus;0.060 to +0.118, p&nbsp;=&nbsp;0.70; with 10-s blocks of the drive as the unit &minus;0.033 to +0.077; on |log(predicted/true)| +0.009,
-        CI &minus;0.012 to +0.032). Here the interval excludes an advantage as large as the simulator's (0.269 vs 0.354 all-pixel
-        AbsRel on held-out frames of the yard the student was fine-tuned on, a different metric);
+        CI &minus;0.012 to +0.032). The interval bounds any advantage of ours at 0.060 (0.033 with blocks), below the simulator's 0.085 (0.269 vs 0.354
+        all-pixel AbsRel on the yard the student was fine-tuned on, a different metric); in relative terms (24&nbsp;%) only the
+        block interval excludes it;
         on the set rebuilt without Fast-FoundationStereo it does not (ours &minus;0.061, block p&nbsp;=&nbsp;0.078, carried by the
         zoo model's blow-ups; on |log| not resolved, CI &minus;0.030 to +0.017).</li>
       <li><b>On obstacles the simulator's advantage is not shown.</b> On points at least 0.15&nbsp;m above each frame's floor plane
@@ -426,7 +427,7 @@
     <p class="tip" id="rw-meta"></p>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Method</th><th class="n">Tracked</th><th class="n">Skill vs standing still</th><th class="n">RMS vs reference</th><th class="n">90th pct</th><th class="n">Path</th><th class="n">Path / reference</th></tr></thead>
+        <thead><tr><th>Method</th><th class="n">Tracked</th><th class="n">Skill, scale fitted</th><th class="n">Skill, rigid</th><th class="n">RMS vs reference</th><th class="n">90th pct</th><th class="n">Path</th><th class="n">Path / reference</th></tr></thead>
         <tbody id="rw-rows"></tbody>
       </table>
     </div>
@@ -445,7 +446,8 @@
         them under the scale-fitting alignment too (+0.01 and +0.02 vs +0.08). A gyro heading from an IMU is the
         planned, untested fix.</li>
       <li><b>Independent systems agree with the reference.</b> VGGT-SLAM 2.0 (2026, monocular) scores +0.80 (bit-identical over three
-        runs) over 99&nbsp;% of the drive; Glob3R +0.72. ORB-SLAM3 on the RealSense stereo pair scores +0.879 &plusmn; 0.013 over three
+        runs) over 99&nbsp;% of the drive (114&nbsp;s in keyframe gaps filled by interpolation; +0.79 scored at its own keyframes only);
+        Glob3R +0.72. ORB-SLAM3 on the RealSense stereo pair scores +0.879 &plusmn; 0.013 over three
         runs, but only on the 13&ndash;19&nbsp;% of the drive it tracks, and it shares the reference's images. DROID-SLAM scores
         +0.27 &plusmn; 0.19 over three runs, so it does not rank against DPV-SLAM (+0.39) or DPVO (+0.29). Monocular ORB-SLAM3 and
         MASt3R-SLAM lose tracking within seconds on sunlit grass.</li>
@@ -468,7 +470,7 @@
       presets, carrying a simulated RealSense infrared pair (SGBM), a planar lidar ring and exact depth. Every source went through
       our SLAM; trajectory error (ATE) is measured against the true poses. Our student is in-distribution here: it was fine-tuned
       on exact depth rendered in this same yard.</p>
-    <div class="table-scroll"><table><thead><tr><th>Front end and scan</th><th class="n">exact depth</th><th class="n">SGBM stereo</th><th class="n">ours, float</th><th class="n">ours, Hailo chip</th></tr></thead><tbody><tr><td><em>Commands only, no scan matching</em> (noon; 0.161 once closures matched on exact-depth scans are added, 2 of 2 false)</td><td class="n" colspan="4" style="text-align:center">0.107</td></tr><tr><td>Lidar ring as the scan (the same renderer's depth: a consistency check)</td><td class="n" colspan="4" style="text-align:center">0.083&thinsp;&plusmn;&thinsp;0.013</td></tr><tr><td>Deployed front end: ground visual odometry</td><td class="n">0.671&thinsp;&plusmn;&thinsp;0.003</td><td class="n">0.543&thinsp;&plusmn;&thinsp;0.078</td><td class="n">0.532&thinsp;&plusmn;&thinsp;0.062</td><td class="n">0.561&thinsp;&plusmn;&thinsp;0.077</td></tr><tr><td>Deployed pseudo-scan (floor contact)</td><td class="n">0.844&thinsp;&plusmn;&thinsp;0.034</td><td class="n">0.813&thinsp;&plusmn;&thinsp;0.107</td><td class="n">0.650&thinsp;&plusmn;&thinsp;0.327</td><td class="n">0.489&thinsp;&plusmn;&thinsp;0.278</td></tr><tr><td>Horizontal-plane scan, per-frame floor-fit scale</td><td class="n">0.501&thinsp;&plusmn;&thinsp;0.069</td><td class="n">0.356, 0.609&dagger;</td><td class="n">0.433&thinsp;&plusmn;&thinsp;0.090</td><td class="n">0.523&thinsp;&plusmn;&thinsp;0.166</td></tr><tr><td>&hellip; the floor-fit scale smoothed over ~20 frames</td><td class="n">0.415&thinsp;&plusmn;&thinsp;0.129</td><td class="n">0.827, 0.612&dagger;</td><td class="n">0.732&thinsp;&plusmn;&thinsp;0.057</td><td class="n">0.469&thinsp;&plusmn;&thinsp;0.228</td></tr><tr><td>&hellip; the <em>true</em> metric scale</td><td class="n"><b>0.074&thinsp;&plusmn;&thinsp;0.003</b></td><td class="n">0.195&thinsp;&plusmn;&thinsp;0.048</td><td class="n">&ndash;</td><td class="n">&ndash;</td></tr></tbody></table><p class="tip" style="margin:8px 0 0">ATE in metres after loop closure, mean &plusmn; sd over three sessions (noon, evening, dusk) of one seed and one trajectory: the spread is lighting plus render nondeterminism, not seeds or routes. &dagger; dusk excluded: SGBM gave no usable scan and the arm fell back to the commands; its two remaining sessions are listed (noon, evening). The simulated car obeys its commands without slip, so every camera arm shows how much a depth source corrupts a near-exact prior. The network has no true scale, hence no entry. The last two columns are the same network: its int8 output from the Pi's Hailo-8L on the same frames agrees with the float twin at r&nbsp;0.9999 per frame, yet moves the per-session ATE by a median 0.13&nbsp;m (up to 0.48&nbsp;m, 12 pairs): this SLAM amplifies tiny depth differences, so gaps between camera arms smaller than that are not resolved.</p></div>
+    <div class="table-scroll"><table class="hitl"><thead><tr><th>Front end and scan</th><th class="n">exact depth</th><th class="n">SGBM stereo</th><th class="n">ours, float</th><th class="n">ours, Hailo chip</th></tr></thead><tbody><tr><td><em>Commands only, no scan matching</em> (noon; 0.161 once closures matched on exact-depth scans are added, 2 of 2 false)</td><td class="n" colspan="4" style="text-align:center">0.107</td></tr><tr><td>Lidar ring as the scan (the same renderer's depth: a consistency check)</td><td class="n" colspan="4" style="text-align:center">0.083&thinsp;&plusmn;&thinsp;0.013</td></tr><tr><td>Deployed front end: ground visual odometry</td><td class="n">0.671&thinsp;&plusmn;&thinsp;0.003</td><td class="n">0.543&thinsp;&plusmn;&thinsp;0.078</td><td class="n">0.532&thinsp;&plusmn;&thinsp;0.062</td><td class="n">0.561&thinsp;&plusmn;&thinsp;0.077</td></tr><tr><td>Deployed pseudo-scan (floor contact)</td><td class="n">0.844&thinsp;&plusmn;&thinsp;0.034</td><td class="n">0.813&thinsp;&plusmn;&thinsp;0.107</td><td class="n">0.650&thinsp;&plusmn;&thinsp;0.327</td><td class="n">0.489&thinsp;&plusmn;&thinsp;0.278</td></tr><tr><td>Horizontal-plane scan, per-frame floor-fit scale</td><td class="n">0.501&thinsp;&plusmn;&thinsp;0.069</td><td class="n">0.356, 0.609&dagger;</td><td class="n">0.433&thinsp;&plusmn;&thinsp;0.090</td><td class="n">0.523&thinsp;&plusmn;&thinsp;0.166</td></tr><tr><td>&hellip; the floor-fit scale smoothed over ~20 frames</td><td class="n">0.415&thinsp;&plusmn;&thinsp;0.129</td><td class="n">0.827, 0.612&dagger;</td><td class="n">0.732&thinsp;&plusmn;&thinsp;0.057</td><td class="n">0.469&thinsp;&plusmn;&thinsp;0.228</td></tr><tr><td>&hellip; the <em>true</em> metric scale</td><td class="n"><b>0.074&thinsp;&plusmn;&thinsp;0.003</b></td><td class="n">0.195&thinsp;&plusmn;&thinsp;0.048</td><td class="n">&ndash;</td><td class="n">&ndash;</td></tr></tbody></table><p class="tip" style="margin:8px 0 0">ATE in metres after loop closure, mean &plusmn; sd over three sessions (noon, evening, dusk) of one seed and one trajectory: the spread is lighting plus render nondeterminism, not seeds or routes. &dagger; dusk excluded: SGBM gave no usable scan and the arm fell back to the commands; its two remaining sessions are listed (noon, evening). The simulated car obeys its commands without slip, so every camera arm shows how much a depth source corrupts a near-exact prior. The network has no true scale, hence no entry. The last two columns are the same network: its int8 output from the Pi's Hailo-8L on the same frames agrees with the float twin at r&nbsp;0.9999 per frame, yet moves the per-session ATE by a median 0.13&nbsp;m (up to 0.48&nbsp;m, 12 pairs): this SLAM amplifies tiny depth differences, so gaps between camera arms smaller than that are not resolved.</p></div>
     <p class="tip" style="margin:10px 0 0"><b>The SLAM needs a better scale than its per-frame floor fit.</b> Giving exact depth
       its true scale instead of the per-frame floor-fit scale from camera height cuts the error 6.8&times; after loop closure
       (6.3&ndash;7.4&times; per session; 3.1&times; for the front end alone). Smoothing the floor-fit scale in time does not recover it: on exact depth the fit puts a true 2&nbsp;m at a median
@@ -476,6 +478,14 @@
       Every camera arm except true-scale exact depth is worse than the commands alone. Of the ways to get a correct scale, only
       stereo was tested here; an IMU or a metric model is untested.</p>
   </div>
+
+  <figure class="figure" style="margin-top:22px">
+    <video src="assets/realworld/splat.mp4" controls playsinline muted loop preload="metadata"
+      style="width:100%;border-radius:14px;display:block;background:#0b0e10"></video>
+    <figcaption>A stretch of the same park as a 3D Gaussian splat, the camera rising under the trees: trained on the colour images
+      with the RealSense depth as a geometry prior within 3&nbsp;m. A picture of the place, not part of the comparison; its floaters
+      and smeared trunks are the method's real output.</figcaption>
+  </figure>
 
   <details class="panel">
     <summary>Method details, calibration, corrections and recorder defects</summary>

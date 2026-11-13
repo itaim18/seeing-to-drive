@@ -28,8 +28,11 @@
   const el = (n, a, parent) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); (parent || svg).appendChild(e); return e; };
   fetch("assets/realworld/slam.json").then(r => r.json()).then(D => {
     const W = 760, H = 560, pad = 28;
-    const xs = D.tracks.flatMap(t => t.x), ys = D.tracks.flatMap(t => t.y);
-    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    // frame the tracks shown by default (+5 %), not every hidden ablation: they would shrink the visible ones
+    const shown0 = D.tracks.filter(t => t.coverage >= 0.5 && (["rgbd_ref", "deployed", "deployed_d435"].includes(t.role) || t.key === "vggtslam2_mono_rgb"));
+    const xs = shown0.flatMap(t => t.x), ys = shown0.flatMap(t => t.y);
+    const px_ = 0.05 * (Math.max(...xs) - Math.min(...xs)), py_ = 0.05 * (Math.max(...ys) - Math.min(...ys));
+    const x0 = Math.min(...xs) - px_, x1 = Math.max(...xs) + px_, y0 = Math.min(...ys) - py_, y1 = Math.max(...ys) + py_;
     // plot x (forward at start) up, y (left) to the left; equal metres on both axes
     const s = Math.min((W - 2 * pad) / (y1 - y0), (H - 2 * pad) / (x1 - x0));
     const cx = (W - s * (y1 - y0)) / 2, cy = (H - s * (x1 - x0)) / 2;
@@ -80,14 +83,15 @@
       if (partial) tr.className = (tr.className + " partial").trim();
       [t.label + (mono ? " · scale given by alignment" : "") + (partial ? " · partial" : ""),
        Math.round(t.coverage * 100) + " % (" + t.seconds_tracked.toFixed(0) + " s)",
-       ref ? "–" : skillText(t, D),
+       ref ? "–" : (mono ? skillText(t, D) : sgn(t.skill_sim2 ?? t.skill)),
+       ref || mono ? "–" : skillText(t, D),
        ref ? "reference" : t.rms_m.toFixed(2) + " m", ref ? "–" : t.p90_m.toFixed(2) + " m",
        mono ? "–" : t.path_m.toFixed(1) + " m", mono ? "n/a" : t.path_ratio.toFixed(2)]
         .forEach((c, i) => { const td = document.createElement("td"); td.textContent = c; if (i) td.className = "n"; tr.appendChild(td); });
       const ours = t.key.startsWith("ours_");
       const grp = ref ? 0 : partial ? 3 : ours ? 2 : 1;            // reference, independent, our stack's arms, partial
       const r = (D.repeats || {})[t.key];
-      tableRows.push({ tr, grp, sk: r && r.n > 1 ? r.skill_mean : t.skill });
+      tableRows.push({ tr, grp, sk: mono ? (r && r.n > 1 ? r.skill_mean : t.skill) : (t.skill_sim2 ?? t.skill) });
     });
     tableRows.sort((a, b) => a.grp - b.grp || b.sk - a.sk).forEach(x => rows.appendChild(x.tr));
     // time-linked hover: nearest point on any track -> every track's position at that time
