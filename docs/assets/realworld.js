@@ -13,13 +13,13 @@
   // independent metric references are drawn in neutral ink (the yardstick, not a competitor); every other method
   // is grey with its own dash, so identity never rests on colour alone.
   const ROLE = {
-    ours: { c: "#d95926", w: 2.4, dash: "" },
-    d435: { c: "#199e70", w: 2, dash: "" },
+    ours: { c: "#e9c25a", w: 1.8, dash: "" },                   // gate fixed: gold, as in the video
+    d435: { c: "#199e70", w: 1.6, dash: "4 3" },
     vo: { c: "#3987e5", w: 1.6, dash: "" },
     stereo_ref: { c: "#f4efe6", w: 2.6, dash: "" },
     rgbd_ref: { c: "#f4efe6", w: 2.6, dash: "" },
-    deployed: { c: "#d95926", w: 1.4, dash: "4 3" },            // same depth source as "ours", the gate as deployed
-    deployed_d435: { c: "#199e70", w: 1.4, dash: "4 3" },
+    deployed: { c: "#d95926", w: 2.4, dash: "" },               // ours as deployed: solid orange everywhere (video, PDF)
+    deployed_d435: { c: "#199e70", w: 2, dash: "" },
     baseline: { c: "#8f9894", w: 1.5, dash: "6 3" },
     dr: { c: "#8f9894", w: 1.4, dash: "5 4" },
   };
@@ -45,7 +45,7 @@
     const tracks = [...D.tracks].sort((a, b) => order.indexOf(a.role) - order.indexOf(b.role));
     const marks = {}, lines = {};
     // the core comparison + every INDEPENDENT method that tracked the drive; degenerate or lost runs start hidden
-    const shownByDefault = t => t.coverage >= 0.5 && ["ours", "d435", "rgbd_ref", "deployed"].includes(t.role);
+    const shownByDefault = t => t.coverage >= 0.5 && (["rgbd_ref", "deployed", "deployed_d435"].includes(t.role) || t.key === "vggtslam2_mono_rgb");
     const visible = {}; tracks.forEach(t => { visible[t.key] = shownByDefault(t); });
     tracks.forEach(t => {
       const st = style(t);
@@ -61,6 +61,7 @@
     el("circle", { cx: s0[0], cy: s0[1], r: 6, fill: "none", stroke: "#f4efe6", "stroke-width": 2 });
     el("text", { x: s0[0] + 10, y: s0[1] + 4, fill: "#f4efe6", "font-size": 12 }).textContent = "start";
     // legend (always, >= 2 series) + table
+    const tableRows = [];
     tracks.slice().reverse().forEach(t => {
       const st = style(t);
       const li = document.createElement("button"); li.type = "button"; li.className = "rw-key";
@@ -83,8 +84,12 @@
        ref ? "reference" : t.rms_m.toFixed(2) + " m", ref ? "–" : t.p90_m.toFixed(2) + " m",
        mono ? "–" : t.path_m.toFixed(1) + " m", mono ? "n/a" : t.path_ratio.toFixed(2)]
         .forEach((c, i) => { const td = document.createElement("td"); td.textContent = c; if (i) td.className = "n"; tr.appendChild(td); });
-      rows.appendChild(tr);
+      const ours = t.key.startsWith("ours_");
+      const grp = ref ? 0 : partial ? 3 : ours ? 2 : 1;            // reference, independent, our stack's arms, partial
+      const r = (D.repeats || {})[t.key];
+      tableRows.push({ tr, grp, sk: r && r.n > 1 ? r.skill_mean : t.skill });
     });
+    tableRows.sort((a, b) => a.grp - b.grp || b.sk - a.sk).forEach(x => rows.appendChild(x.tr));
     // time-linked hover: nearest point on any track -> every track's position at that time
     const T = tracks[0].t;
     const hit = el("rect", { x: 0, y: 0, width: W, height: H, fill: "transparent" });
