@@ -328,8 +328,8 @@
     <ul class="glance">
       <li><b>Depth:</b> on 1,000 points where three stereo matchers agree, ours scores AbsRel 0.262 and the Hailo Model Zoo's
         Depth Anything V2-S 0.234: not resolvably different (95&nbsp;% CI &minus;0.060 to +0.118).</li>
-      <li><b>Obstacles:</b> the simulator's advantage is not shown (an exploratory lean, not significant after correction;
-        details below).</li>
+      <li><b>Obstacles:</b> the simulator's advantage is not shown (an exploratory lean: after correction p&nbsp;=&nbsp;0.046 or 0.14, depending on which
+        tests are grouped; details below).</li>
       <li><b>Range:</b> beyond 1&nbsp;m the network's obstacle range is within a median 25&nbsp;% of the RealSense's
         (signed &minus;7&nbsp;%: a little nearer).</li>
       <li><b>SLAM:</b> VGGT-SLAM 2.0 agrees with the independent reference (skill +0.80); ours +0.10, the commands alone +0.08
@@ -383,10 +383,10 @@
 </tbody></table></div>
     <ul class="rw-notes" style="margin-top:14px">
       <li><b>Ours and the vendor's model are not resolvably different on these mostly-ground points</b> (difference +0.017, 95&nbsp;% CI
-        &minus;0.060 to +0.118, p&nbsp;=&nbsp;0.70; with 10-s blocks of the drive as the unit &minus;0.033 to +0.077; on |log(predicted/true)| +0.009,
-        CI &minus;0.012 to +0.032). The interval bounds any advantage of ours at 0.060 (0.033 with blocks), below the simulator's 0.085 (0.269 vs 0.354
+        &minus;0.060 to +0.118, p&nbsp;=&nbsp;0.70; with 10-s blocks of the drive as the unit, from inverting the exact sign-flip test, &minus;0.040 to +0.075; on |log(predicted/true)| +0.009,
+        CI &minus;0.012 to +0.032). The interval bounds any advantage of ours at 0.060 (0.040 with blocks), below the simulator's 0.085 (0.269 vs 0.354
         all-pixel AbsRel on the yard the student was fine-tuned on, a different metric); in relative terms (24&nbsp;%) only the
-        block interval excludes it;
+        block interval excludes it (&minus;17&nbsp;%);
         on the set rebuilt without Fast-FoundationStereo it does not (ours &minus;0.061, block p&nbsp;=&nbsp;0.078, carried by the
         zoo model's blow-ups; on |log| not resolved, CI &minus;0.030 to +0.017).</li>
       <li><b>On obstacles the simulator's advantage is not shown.</b> On points at least 0.15&nbsp;m above each frame's floor plane
@@ -427,7 +427,7 @@
     <p class="tip" id="rw-meta"></p>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Method</th><th class="n">Tracked</th><th class="n">Skill, scale fitted</th><th class="n">Skill, rigid</th><th class="n">RMS vs reference</th><th class="n">90th pct</th><th class="n">Path</th><th class="n">Path / reference</th></tr></thead>
+        <thead><tr><th>Method</th><th class="n">Tracked</th><th class="n">Skill, scale fitted</th><th class="n">Skill, rigid</th><th class="n">RMS vs reference</th><th class="n">Path</th><th class="n">Path / reference</th></tr></thead>
         <tbody id="rw-rows"></tbody>
       </table>
     </div>
@@ -446,7 +446,7 @@
         them under the scale-fitting alignment too (+0.01 and +0.02 vs +0.08). A gyro heading from an IMU is the
         planned, untested fix.</li>
       <li><b>Independent systems agree with the reference.</b> VGGT-SLAM 2.0 (2026, monocular) scores +0.80 (bit-identical over three
-        runs) over 99&nbsp;% of the drive (114&nbsp;s in keyframe gaps filled by interpolation; +0.79 scored at its own keyframes only);
+        runs) over 99&nbsp;% of the drive (117&nbsp;s in keyframe gaps filled by interpolation; +0.79 scored at its own keyframes only);
         Glob3R +0.72. ORB-SLAM3 on the RealSense stereo pair scores +0.879 &plusmn; 0.013 over three
         runs, but only on the 13&ndash;19&nbsp;% of the drive it tracks, and it shares the reference's images. DROID-SLAM scores
         +0.27 &plusmn; 0.19 over three runs, so it does not rank against DPV-SLAM (+0.39) or DPVO (+0.29). Monocular ORB-SLAM3 and
@@ -461,16 +461,24 @@
         point (5.6&nbsp;px lower) would change each range by about 11&nbsp;% at 1.5&nbsp;m and 23&nbsp;% at 3&nbsp;m, in the same direction for both,
         so the 25&nbsp;% describes the deployed geometry, not a calibrated range error. Inside 1&nbsp;m both mark grass as obstacles, in different places: the stereo marks
         63&nbsp;% of image columns blocked, the network 41&nbsp;%. Neither is right on grass, which this car drives straight over.</li>
+      <li><b>Seen from above.</b> Of the 10&nbsp;cm cells in which either map holds a point at least 0.15&nbsp;m above the ground, the stereo
+        marks 86&nbsp;% and the network 39&nbsp;% (both 25&nbsp;%): the network finds 29&nbsp;% of the stereo's cells, and 63&nbsp;% of its own are
+        also the stereo's. Descriptive: the cell size and height threshold were not varied, and the network's map carries its floor-fit scale.</li>
     </ul>
+    <figure class="figure" style="margin:14px 0 0">
+      <img src="assets/realworld/overlay.jpg" alt="Top-down map of the park: obstacle cells marked by the stereo only, the network only, or both"
+        style="width:100%;border-radius:12px;display:block" loading="lazy">
+      <figcaption>The two obstacle maps from above, from the video: cells only the stereo marks, only the network marks, and both.</figcaption>
+    </figure>
   </div>
 
   <div class="panel" style="margin-top:22px">
-    <h3 style="margin-top:0">Inside SLAM, scale matters more than the depth source (simulator, with ground truth)</h3>
+    <h3 style="margin-top:0">Inside SLAM, a correct scale matters most: true scale 0.074&nbsp;m vs floor fit 0.42&ndash;0.84&nbsp;m (simulator, with ground truth)</h3>
     <p class="tip" style="margin:0 0 10px">In the hardware-in-the-loop simulator the car drove a loop twice under three lighting
       presets, carrying a simulated RealSense infrared pair (SGBM), a planar lidar ring and exact depth. Every source went through
       our SLAM; trajectory error (ATE) is measured against the true poses. Our student is in-distribution here: it was fine-tuned
       on exact depth rendered in this same yard.</p>
-    <div class="table-scroll"><table class="hitl"><thead><tr><th>Front end and scan</th><th class="n">exact depth</th><th class="n">SGBM stereo</th><th class="n">ours, float</th><th class="n">ours, Hailo chip</th></tr></thead><tbody><tr><td><em>Commands only, no scan matching</em> (noon; 0.161 once closures matched on exact-depth scans are added, 2 of 2 false)</td><td class="n" colspan="4" style="text-align:center">0.107</td></tr><tr><td>Lidar ring as the scan (the same renderer's depth: a consistency check)</td><td class="n" colspan="4" style="text-align:center">0.083&thinsp;&plusmn;&thinsp;0.013</td></tr><tr><td>Deployed front end: ground visual odometry</td><td class="n">0.671&thinsp;&plusmn;&thinsp;0.003</td><td class="n">0.543&thinsp;&plusmn;&thinsp;0.078</td><td class="n">0.532&thinsp;&plusmn;&thinsp;0.062</td><td class="n">0.561&thinsp;&plusmn;&thinsp;0.077</td></tr><tr><td>Deployed pseudo-scan (floor contact)</td><td class="n">0.844&thinsp;&plusmn;&thinsp;0.034</td><td class="n">0.813&thinsp;&plusmn;&thinsp;0.107</td><td class="n">0.650&thinsp;&plusmn;&thinsp;0.327</td><td class="n">0.489&thinsp;&plusmn;&thinsp;0.278</td></tr><tr><td>Horizontal-plane scan, per-frame floor-fit scale</td><td class="n">0.501&thinsp;&plusmn;&thinsp;0.069</td><td class="n">0.356, 0.609&dagger;</td><td class="n">0.433&thinsp;&plusmn;&thinsp;0.090</td><td class="n">0.523&thinsp;&plusmn;&thinsp;0.166</td></tr><tr><td>&hellip; the floor-fit scale smoothed over ~20 frames</td><td class="n">0.415&thinsp;&plusmn;&thinsp;0.129</td><td class="n">0.827, 0.612&dagger;</td><td class="n">0.732&thinsp;&plusmn;&thinsp;0.057</td><td class="n">0.469&thinsp;&plusmn;&thinsp;0.228</td></tr><tr><td>&hellip; the <em>true</em> metric scale</td><td class="n"><b>0.074&thinsp;&plusmn;&thinsp;0.003</b></td><td class="n">0.195&thinsp;&plusmn;&thinsp;0.048</td><td class="n">&ndash;</td><td class="n">&ndash;</td></tr></tbody></table><p class="tip" style="margin:8px 0 0">ATE in metres after loop closure, mean &plusmn; sd over three sessions (noon, evening, dusk) of one seed and one trajectory: the spread is lighting plus render nondeterminism, not seeds or routes. &dagger; dusk excluded: SGBM gave no usable scan and the arm fell back to the commands; its two remaining sessions are listed (noon, evening). The simulated car obeys its commands without slip, so every camera arm shows how much a depth source corrupts a near-exact prior. The network has no true scale, hence no entry. The last two columns are the same network: its int8 output from the Pi's Hailo-8L on the same frames agrees with the float twin at r&nbsp;0.9999 per frame, yet moves the per-session ATE by a median 0.13&nbsp;m (up to 0.48&nbsp;m, 12 pairs): this SLAM amplifies tiny depth differences, so gaps between camera arms smaller than that are not resolved.</p></div>
+    <div class="table-scroll"><table class="hitl"><thead><tr><th>Front end and scan</th><th class="n">exact depth</th><th class="n">SGBM stereo</th><th class="n">ours, float</th><th class="n">ours, Hailo chip</th></tr></thead><tbody><tr><td><em>Commands only, no scan matching</em> (noon; 0.161 once closures matched on exact-depth scans are added, 2 of 2 false)</td><td class="n" colspan="4" style="text-align:center">0.107</td></tr><tr><td>Lidar ring as the scan (the same renderer's depth: a consistency check)</td><td class="n" colspan="4" style="text-align:center">0.083&thinsp;&plusmn;&thinsp;0.013</td></tr><tr><td>Deployed front end: ground visual odometry</td><td class="n">0.671&thinsp;&plusmn;&thinsp;0.003</td><td class="n">0.543&thinsp;&plusmn;&thinsp;0.078</td><td class="n">0.532&thinsp;&plusmn;&thinsp;0.062</td><td class="n">0.561&thinsp;&plusmn;&thinsp;0.077</td></tr><tr><td>Deployed pseudo-scan (floor contact)</td><td class="n">0.844&thinsp;&plusmn;&thinsp;0.034</td><td class="n">0.813&thinsp;&plusmn;&thinsp;0.107</td><td class="n">0.650&thinsp;&plusmn;&thinsp;0.327</td><td class="n">0.489&thinsp;&plusmn;&thinsp;0.278</td></tr><tr><td>Horizontal-plane scan, per-frame floor-fit scale</td><td class="n">0.501&thinsp;&plusmn;&thinsp;0.069</td><td class="n">0.356, 0.609&dagger;</td><td class="n">0.433&thinsp;&plusmn;&thinsp;0.090</td><td class="n">0.523&thinsp;&plusmn;&thinsp;0.166</td></tr><tr><td>&hellip; the floor-fit scale smoothed over ~20 frames</td><td class="n">0.415&thinsp;&plusmn;&thinsp;0.129</td><td class="n">0.827, 0.612&dagger;</td><td class="n">0.732&thinsp;&plusmn;&thinsp;0.057</td><td class="n">0.469&thinsp;&plusmn;&thinsp;0.228</td></tr><tr><td>&hellip; the <em>true</em> metric scale</td><td class="n"><b>0.074&thinsp;&plusmn;&thinsp;0.003</b></td><td class="n">0.195&thinsp;&plusmn;&thinsp;0.048</td><td class="n">&ndash;</td><td class="n">&ndash;</td></tr></tbody></table><p class="tip" style="margin:8px 0 0">ATE in metres after loop closure, mean &plusmn; sd over three sessions (noon, evening, dusk) of one seed and one trajectory: the spread is lighting plus render nondeterminism, not seeds or routes. &dagger; dusk excluded: SGBM gave no usable scan and the arm fell back to the commands; its two remaining sessions are listed (noon, evening). The simulated car obeys its commands without slip, so every camera arm shows how much a depth source corrupts a near-exact prior. The network has no true scale, hence no entry. The last two columns are the same network: its int8 output from the Pi's Hailo-8L on the same frames agrees with the float twin at a median r&nbsp;0.9999 (noon), 0.9998 (evening) and 0.9988 (dusk) per frame, but the floor-fit scale the SLAM takes from it differs by a median -1.4 to +0.6&nbsp;% (dusk 5&ndash;95&nbsp;%: -8 to +5&nbsp;%), which moves the per-session ATE by a median 0.13&nbsp;m (up to 0.48&nbsp;m, 12 pairs): this SLAM turns scale differences of a few per cent into tenths of a metre, so gaps between camera arms smaller than that are not resolved. <span class="on">On a phone the SGBM and chip columns are hidden; the full table is on desktop.</span></p></div>
     <p class="tip" style="margin:10px 0 0"><b>The SLAM needs a better scale than its per-frame floor fit.</b> Giving exact depth
       its true scale instead of the per-frame floor-fit scale from camera height cuts the error 6.8&times; after loop closure
       (6.3&ndash;7.4&times; per session; 3.1&times; for the front end alone). Smoothing the floor-fit scale in time does not recover it: on exact depth the fit puts a true 2&nbsp;m at a median

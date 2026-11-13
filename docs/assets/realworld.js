@@ -84,10 +84,13 @@
       [t.label + (mono ? " · scale given by alignment" : "") + (partial ? " · partial" : ""),
        Math.round(t.coverage * 100) + " % (" + t.seconds_tracked.toFixed(0) + " s)",
        ref ? "–" : (mono ? skillText(t, D) : sgn(t.skill_sim2 ?? t.skill)),
-       ref || mono ? "–" : skillText(t, D),
-       ref ? "reference" : t.rms_m.toFixed(2) + " m", ref ? "–" : t.p90_m.toFixed(2) + " m",
+       // one run on both skill columns (the same run the scale-fitted column shows); repeats are named, never mixed in
+       ref || mono ? "–" : sgn(t.skill) + ((D.repeats || {})[t.key]?.n > 1 ? ` · ${D.repeats[t.key].n} runs ${skillText(t, D).split(" (")[0]}` : ""),
+       ref ? "reference" : t.rms_m.toFixed(2) + " m",
        mono ? "–" : t.path_m.toFixed(1) + " m", mono ? "n/a" : t.path_ratio.toFixed(2)]
-        .forEach((c, i) => { const td = document.createElement("td"); td.textContent = c; if (i) td.className = "n"; tr.appendChild(td); });
+        .forEach((c, i) => { const td = document.createElement("td"); td.textContent = c; if (i) td.className = "n";
+          if (i === 2 && !ref && !mono) { const sp = document.createElement("span"); sp.className = "on"; sp.textContent = ` (rigid ${sgn(t.skill)})`; td.appendChild(sp); }
+          tr.appendChild(td); });
       const ours = t.key.startsWith("ours_");
       const grp = ref ? 0 : partial ? 3 : ours ? 2 : 1;            // reference, independent, our stack's arms, partial
       const r = (D.repeats || {})[t.key];
