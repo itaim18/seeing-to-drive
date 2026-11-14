@@ -79,6 +79,7 @@
         visible[t.key] = !visible[t.key]; li.setAttribute("aria-pressed", String(visible[t.key]));
         lines[t.key].setAttribute("visibility", visible[t.key] ? "visible" : "hidden");
       });
+      if (!visible[t.key]) li.classList.add("more");
       if (!/_no_match|_realgate|_dead_reckoning/.test(t.key) || t.key === "ours_hailo_dead_reckoning") legend.appendChild(li);
       const tr = document.createElement("tr"); if (t.role === "deployed") tr.className = "ours";   // highlight = ours as deployed (orange everywhere)
       const ref = t.key === D.reference;
@@ -94,16 +95,30 @@
        mono ? "n/a" : t.path_ratio.toFixed(2)]
         .forEach((c, i) => { const td = document.createElement("td"); td.textContent = c; if (i) td.className = "n";
           if (i === 0) {                                            // suffixes hidden on a phone (class sfx)
-            const r = (D.repeats || {})[t.key], rig = r && r.n > 1 && !mono && !ref ? ` (rigid over ${r.n} runs ${sgn(r.skill_mean)} ± ${r.skill_sd.toFixed(3)})` : "";
+            const r = (D.repeats || {})[t.key], rig = r && r.n > 1 && !mono && !ref ? ` (rigid over ${r.n} runs ${(r.skill_mean >= 0 ? "+" : "−") + Math.abs(r.skill_mean).toFixed(3)} ± ${r.skill_sd.toFixed(3)})` : "";
             const sx = document.createElement("span"); sx.className = "sfx"; sx.textContent = runsText(t, D) + rig + (partial ? " · partial" : ""); td.appendChild(sx); }
           if (i === 2 && !ref && !mono) { const sp = document.createElement("span"); sp.className = "on rig"; sp.textContent = `rigid ${sgn(t.skill)}`; td.appendChild(sp); }
           tr.appendChild(td); });
       const ours = t.key.startsWith("ours_");
       const grp = ref ? 0 : partial ? 3 : ours ? 2 : 1;            // reference, independent, our stack's arms, partial
       const r = (D.repeats || {})[t.key];
-      tableRows.push({ tr, grp, sk: mono ? (r && r.n > 1 ? r.skill_mean : t.skill) : (t.skill_sim2 ?? t.skill) });
+      tableRows.push({ tr, grp, abl: /_no_match/.test(t.key), sk: mono ? (r && r.n > 1 ? r.skill_mean : t.skill) : (t.skill_sim2 ?? t.skill) });
     });
-    tableRows.sort((a, b) => a.grp - b.grp || b.sk - a.sk).forEach(x => rows.appendChild(x.tr));
+    const sep = (txt, cls) => { const tr = document.createElement("tr"); tr.className = "sep" + (cls ? " " + cls : ""); const td = document.createElement("td"); td.colSpan = 6; td.textContent = txt; tr.appendChild(td); return tr; };
+    let lastGrp = -1;
+    { const nMore = legend.querySelectorAll(".rw-key.more").length, mb = document.createElement("button");
+      mb.type = "button"; mb.className = "rw-key rw-more"; mb.textContent = `More methods (${nMore})`;
+      mb.addEventListener("click", () => { legend.classList.toggle("all"); mb.textContent = legend.classList.contains("all") ? "Fewer methods" : `More methods (${nMore})`; });
+      legend.appendChild(mb); }
+    tableRows.sort((a, b) => a.grp - b.grp || b.sk - a.sk).forEach(x => {
+      if (x.grp === 3 && lastGrp !== 3) rows.appendChild(sep("Partial tracks (at most 23 % of the drive): not rankable against full-drive skill"));
+      lastGrp = x.grp; if (x.abl) x.tr.classList.add("abl"); rows.appendChild(x.tr); });
+    const nAbl = tableRows.filter(x => x.abl).length;
+    if (nAbl) { const tr = sep("", ""); const btn = document.createElement("button"); btn.type = "button"; btn.className = "rw-key";
+      btn.textContent = `Show ${nAbl} ablations (our stack with the scan match off): each within 0.015 of its arm`;
+      btn.addEventListener("click", () => { const t = rows.closest("table"); t.classList.toggle("showabl");
+        btn.textContent = t.classList.contains("showabl") ? "Hide the ablations" : `Show ${nAbl} ablations (our stack with the scan match off): each within 0.015 of its arm`; });
+      tr.firstChild.appendChild(btn); rows.appendChild(tr); }
     // time-linked hover: nearest point on any track -> every track's position at that time
     const T = tracks[0].t;
     const hit = el("rect", { x: 0, y: 0, width: W, height: H, fill: "transparent" });

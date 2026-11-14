@@ -295,7 +295,7 @@
   <style>
     #realworld td:first-child, #realworld tr.sep td { white-space: normal; min-width: 14em; }
     #realworld .tip, #realworld .rw-notes { font-family: inherit; font-weight: 400; font-size: 0.95rem; line-height: 1.55; }
-    #realworld .glance { margin: 14px 0 0; padding: 0 0 0 20px; }
+    #realworld .glance { margin: 14px 0 0; padding: 0 0 0 20px; max-width: 72ch; }
     #realworld .glance li { margin: 6px 0; }
     #realworld details { margin-top: 22px; }
     #realworld .on { display: none; color: var(--soft); }
@@ -305,9 +305,12 @@
     #realworld figcaption { max-width: 72ch; }
     #realworld h3 { font-size: 1.25rem; }
     #realworld .table-scroll > p.tip { padding: 10px 14px; }
-    #realworld .obgrid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 7fr); gap: 22px; align-items: center; margin-top: 14px; }
+    #realworld .obgrid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 7fr); gap: 22px; align-items: start; margin-top: 14px; }
     #realworld .sw { display: inline-block; width: 14px; height: 14px; border-radius: 3px; margin-right: 8px; vertical-align: -2px; }
     #realworld .oblegend p { margin: 6px 0; }
+    #realworld table.bench td.n, #realworld table.bench th.n { padding-left: 28px; }
+    #realworld tr.abl { display: none; } #realworld table.showabl tr.abl { display: table-row; }
+    #realworld .rw-more { display: none; }
     @media (max-width: 600px) {
       #realworld table { min-width: 0; width: 100%; }
       #realworld th { white-space: normal; }
@@ -327,6 +330,10 @@
       #realworld .sfx { display: none; }
       #realworld .rig { display: block; font-size: .75rem; }
       #realworld .obgrid { grid-template-columns: 1fr; }
+      #realworld table.hitl td:first-child { width: 50%; }
+      #realworld .rw-legend { max-height: none; overflow: visible; }
+      #realworld .rw-legend .rw-key.more { display: none; } #realworld .rw-legend.all .rw-key.more { display: inline-flex; }
+      #realworld .rw-more { display: inline-block; }
       #rw-chart text { font-size: 26px; }
       #rw-chart polyline { vector-effect: non-scaling-stroke; }
     }
@@ -358,7 +365,7 @@
       <li><b>Range:</b> beyond 1&nbsp;m the network's obstacle range is within a median 25&nbsp;% of the RealSense's
         (signed &minus;7&nbsp;%: a little nearer).</li>
       <li><b>SLAM:</b> VGGT-SLAM 2.0 agrees with the independent reference (skill +0.80); ours +0.10, the commands alone +0.08
-        (same scale-fitting alignment). As deployed, depth barely enters our trajectory.</li>
+        (same scale-fitting alignment; one run: a 0.02 gap, not a lead). As deployed, depth barely enters our trajectory.</li>
       <li><b>With ground truth (simulator):</b> our SLAM needs a better scale than its per-frame floor fit: the true scale cuts the
         error 6.8&times; after loop closure (6.3&ndash;7.4&times; per session); smoothing the floor fit does not reliably help.</li>
     </ul>
@@ -386,7 +393,7 @@
 <tr><td>DAv2-S, Hailo Model Zoo <span style="color:var(--soft)">(the comparison)</span><span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.234</td><td class="n">0.74</td><td class="n">0.432</td><td class="n">&ndash;</td></tr>
 <tr><td>Ours, replayed on the chip</td><td>Hailo-8L int8</td><td class="n">0.258</td><td class="n">0.74</td><td class="n">0.413</td><td class="n">&ndash;</td></tr>
 <tr><td>Ours, float twin<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.258</td><td class="n">0.75</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
-<tr class="ours"><td><b>Ours: distilled student v5, live on the car</b><span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.262</td><td class="n">0.73</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
+<tr class="ours"><td><b>Ours, live on the chip</b> (distilled student v5)</td><td>Hailo-8L int8</td><td class="n">0.262</td><td class="n">0.73</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
 <tr><td>SC-DepthV3, Hailo Model Zoo<span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.392</td><td class="n">0.22</td><td class="n">0.435</td><td class="n">&ndash;</td></tr>
 <tr><td>FastDepth, Hailo Model Zoo<span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.394</td><td class="n">0.23</td><td class="n">0.415</td><td class="n">&ndash;</td></tr>
 <tr><td>DAv2-S, our int8 build<span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.443</td><td class="n">0.58</td><td class="n">0.439</td><td class="n">&ndash;</td></tr>
@@ -442,6 +449,7 @@
     </ul>
     <div class="obgrid">
       <div class="oblegend tip">
+        <p style="font-size:1.15rem;font-weight:600;margin-bottom:12px"><span style="color:#199e70">stereo 86&nbsp;%</span> &middot; <span style="color:#d95926">network 39&nbsp;%</span></p>
         <p><span class="sw" style="background:#f4efe6"></span>marked by both: 25&nbsp;%</p>
         <p><span class="sw" style="background:#199e70"></span>stereo only: 61&nbsp;%</p>
         <p><span class="sw" style="background:#d95926"></span>network only: 14&nbsp;%</p>
@@ -500,12 +508,12 @@
   </div>
 
   <div class="panel" style="margin-top:22px">
-    <h3 style="margin-top:0">Inside SLAM, a correct scale matters most: 0.074&nbsp;m with the true scale, 0.42&ndash;0.84&nbsp;m for every camera arm without it (simulator, with ground truth)</h3>
+    <h3 style="margin-top:0">Scale matters most (simulator): exact depth with the true scale 0.074&nbsp;m; camera arms without it 0.42&ndash;0.84&nbsp;m</h3>
     <p class="tip" style="margin:0 0 10px">In the hardware-in-the-loop simulator the car drove a loop twice under three lighting
       presets, carrying a simulated RealSense infrared pair (SGBM), a planar lidar ring and exact depth. Every source went through
       our SLAM; trajectory error (ATE) is measured against the true poses. Our student is in-distribution here: it was fine-tuned
       on exact depth rendered in this same yard.</p>
-    <div class="table-scroll"><table class="hitl"><thead><tr><th>Front end and scan</th><th class="n">exact depth</th><th class="n">SGBM stereo</th><th class="n">ours, float</th><th class="n">ours, Hailo chip</th></tr></thead><tbody><tr><td><em>Commands only, no scan matching</em>&nbsp;*</td><td class="n" colspan="4" style="text-align:center">0.107</td></tr><tr><td>Lidar ring as the scan (the same renderer's depth: a consistency check)</td><td class="n" colspan="4" style="text-align:center">0.083&thinsp;&plusmn;&thinsp;0.013</td></tr><tr><td>Deployed front end: ground visual odometry</td><td class="n">0.671&thinsp;&plusmn;&thinsp;0.003</td><td class="n">0.543&thinsp;&plusmn;&thinsp;0.078</td><td class="n">0.532&thinsp;&plusmn;&thinsp;0.062</td><td class="n">0.561&thinsp;&plusmn;&thinsp;0.077</td></tr><tr><td>Deployed pseudo-scan (floor contact)</td><td class="n">0.844&thinsp;&plusmn;&thinsp;0.034</td><td class="n">0.813&thinsp;&plusmn;&thinsp;0.107</td><td class="n">0.650&thinsp;&plusmn;&thinsp;0.327</td><td class="n">0.489&thinsp;&plusmn;&thinsp;0.278</td></tr><tr><td>Horizontal-plane scan, per-frame floor-fit scale</td><td class="n">0.501&thinsp;&plusmn;&thinsp;0.069</td><td class="n">0.356, 0.609&dagger;</td><td class="n">0.433&thinsp;&plusmn;&thinsp;0.090</td><td class="n">0.523&thinsp;&plusmn;&thinsp;0.166</td></tr><tr><td>&hellip; the floor-fit scale smoothed over ~20 frames</td><td class="n">0.415&thinsp;&plusmn;&thinsp;0.129</td><td class="n">0.827, 0.612&dagger;</td><td class="n">0.732&thinsp;&plusmn;&thinsp;0.057</td><td class="n">0.469&thinsp;&plusmn;&thinsp;0.228</td></tr><tr><td>&hellip; the <em>true</em> metric scale</td><td class="n"><b>0.074&thinsp;&plusmn;&thinsp;0.003</b></td><td class="n">0.195&thinsp;&plusmn;&thinsp;0.048</td><td class="n">&ndash;</td><td class="n">&ndash;</td></tr></tbody></table><p class="tip" style="margin:8px 0 0">ATE in metres after loop closure, mean &plusmn; sd over three sessions (noon, evening, dusk) of one seed and one trajectory: the spread is lighting plus render nondeterminism, not seeds or routes. * Noon; 0.161 once closures matched on exact-depth scans are added (2 of 2 false). &dagger; dusk excluded: SGBM gave no usable scan and the arm fell back to the commands; its two remaining sessions are listed (noon, evening). The simulated car obeys its commands without slip, so every camera arm shows how much a depth source corrupts a near-exact prior. The network has no true scale, hence no entry. The last two columns are the same network: its int8 output from the Pi's Hailo-8L on the same frames agrees with the float twin at a median r&nbsp;0.9999 (noon), 0.9998 (evening) and 0.9988 (dusk) per frame, but the floor-fit scale the SLAM takes from it differs by a median -1.4 to +0.6&nbsp;% (dusk 5&ndash;95&nbsp;%: -8 to +5&nbsp;%), which moves the per-session ATE by a median 0.13&nbsp;m (up to 0.48&nbsp;m, 12 pairs): this SLAM turns scale differences of a few per cent into tenths of a metre, so gaps between camera arms smaller than that are not resolved. <span class="on">On a phone the SGBM and chip columns are hidden; the full table is on desktop.</span></p></div>
+    <div class="table-scroll"><table class="hitl"><thead><tr><th>Front end and scan</th><th class="n">exact depth</th><th class="n">SGBM stereo</th><th class="n">ours, float</th><th class="n">ours, Hailo chip</th></tr></thead><tbody><tr><td><em>Commands only, no scan matching</em>&nbsp;*</td><td class="n" colspan="4" style="text-align:center">0.107</td></tr><tr><td>Lidar ring as the scan&nbsp;&Dagger;</td><td class="n" colspan="4" style="text-align:center">0.083&thinsp;&plusmn;&thinsp;0.013</td></tr><tr><td>Deployed front end: ground visual odometry</td><td class="n">0.671&thinsp;&plusmn;&thinsp;0.003</td><td class="n">0.543&thinsp;&plusmn;&thinsp;0.078</td><td class="n">0.532&thinsp;&plusmn;&thinsp;0.062</td><td class="n">0.561&thinsp;&plusmn;&thinsp;0.077</td></tr><tr><td>Deployed pseudo-scan (floor contact)</td><td class="n">0.844&thinsp;&plusmn;&thinsp;0.034</td><td class="n">0.813&thinsp;&plusmn;&thinsp;0.107</td><td class="n">0.650&thinsp;&plusmn;&thinsp;0.327</td><td class="n">0.489&thinsp;&plusmn;&thinsp;0.278</td></tr><tr><td>Horizontal-plane scan, per-frame floor-fit scale</td><td class="n">0.501&thinsp;&plusmn;&thinsp;0.069</td><td class="n">0.356, 0.609&dagger;</td><td class="n">0.433&thinsp;&plusmn;&thinsp;0.090</td><td class="n">0.523&thinsp;&plusmn;&thinsp;0.166</td></tr><tr><td>&hellip; the floor-fit scale smoothed over ~20 frames</td><td class="n">0.415&thinsp;&plusmn;&thinsp;0.129</td><td class="n">0.827, 0.612&dagger;</td><td class="n">0.732&thinsp;&plusmn;&thinsp;0.057</td><td class="n">0.469&thinsp;&plusmn;&thinsp;0.228</td></tr><tr><td>&hellip; the <em>true</em> metric scale</td><td class="n"><b>0.074&thinsp;&plusmn;&thinsp;0.003</b></td><td class="n">0.195&thinsp;&plusmn;&thinsp;0.048</td><td class="n">&ndash;</td><td class="n">&ndash;</td></tr></tbody></table><p class="tip" style="margin:8px 0 0">ATE in metres after loop closure, mean &plusmn; sd over three sessions (noon, evening, dusk) of one seed and one trajectory: the spread is lighting plus render nondeterminism, not seeds or routes. * Noon; 0.161 once closures matched on exact-depth scans are added (2 of 2 false). &Dagger; The same renderer's depth: a consistency check. &dagger; dusk excluded: SGBM gave no usable scan and the arm fell back to the commands; its two remaining sessions are listed (noon, evening). The simulated car obeys its commands without slip, so every camera arm shows how much a depth source corrupts a near-exact prior. The network has no true scale, hence no entry. The last two columns are the same network: its int8 output from the Pi's Hailo-8L on the same frames agrees with the float twin at a median r&nbsp;0.9999 (noon), 0.9998 (evening) and 0.9988 (dusk) per frame, but the floor-fit scale the SLAM takes from it differs by a median &minus;1.4 to +0.6&nbsp;% (dusk 5&ndash;95&nbsp;%: &minus;8 to +5&nbsp;%), which moves the per-session ATE by a median 0.13&nbsp;m (up to 0.48&nbsp;m, 12 pairs): this SLAM turns scale differences of a few per cent into tenths of a metre, so gaps between camera arms smaller than that are not resolved. <span class="on">On a phone the SGBM and chip columns are hidden; the full table is on desktop.</span></p></div>
     <p class="tip" style="margin:10px 0 0"><b>The SLAM needs a better scale than its per-frame floor fit.</b> Giving exact depth
       its true scale instead of the per-frame floor-fit scale from camera height cuts the error 6.8&times; after loop closure
       (6.3&ndash;7.4&times; per session; 3.1&times; for the front end alone). Smoothing the floor-fit scale in time does not recover it: on exact depth the fit puts a true 2&nbsp;m at a median
@@ -514,7 +522,7 @@
       stereo was tested here; an IMU or a metric model is untested.</p>
   </div>
 
-  <figure class="figure" style="margin-top:22px">
+  <figure class="figure" style="margin:22px auto 0;max-width:760px">
     <video src="assets/realworld/splat.mp4" autoplay muted loop playsinline preload="metadata" poster="assets/realworld/splat_poster.jpg"
       style="width:100%;max-width:760px;margin:0 auto;border-radius:14px;display:block;background:#0b0e10"></video>
     <figcaption>A stretch of the same park as a 3D Gaussian splat, the camera rising under the trees: trained on the colour images
