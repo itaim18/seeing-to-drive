@@ -5,7 +5,10 @@
   const sgn = v => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(2);
   // a method run several times shows its mean ± sd, never its best run alone
   const skillText = (t, D) => { const r = (D.repeats || {})[t.key];
-    return r && r.n > 1 && t.key !== D.reference ? `${sgn(r.skill_mean)} ± ${(r.skill_sd + 1e-9).toFixed(2)} (${r.n} runs)` : sgn(t.skill); };
+    return r && r.n > 1 && t.key !== D.reference ? (r.skill_sd < 0.005 ? sgn(r.skill_mean) : `${sgn(r.skill_mean)} ± ${r.skill_sd.toFixed(2)}`) : sgn(t.skill); };
+  // run count goes in the name cell, so number cells stay short
+  const runsText = (t, D) => { const r = (D.repeats || {})[t.key];
+    return r && r.n > 1 && t.key !== D.reference ? (r.skill_sd < 0.005 ? ` · ${r.n} identical runs` : ` · ${r.n} runs`) : ""; };
   if (!svg) return;
   const NS = "http://www.w3.org/2000/svg";
   // validated on the panel surface #171a1b (dataviz validator: all checks pass); fixed order by role
@@ -15,7 +18,7 @@
   const ROLE = {
     ours: { c: "#e9c25a", w: 1.8, dash: "" },                   // gate fixed: gold, as in the video
     d435: { c: "#199e70", w: 1.6, dash: "4 3" },
-    vo: { c: "#3987e5", w: 1.6, dash: "" },
+    vo: { c: "#8f9894", w: 1.4, dash: "2 3" },                 // scan-match-off ablations: grey, dotted
     stereo_ref: { c: "#f4efe6", w: 2.6, dash: "" },
     rgbd_ref: { c: "#f4efe6", w: 2.6, dash: "" },
     deployed: { c: "#d95926", w: 2.4, dash: "" },               // ours as deployed: solid orange everywhere (video, PDF)
@@ -24,7 +27,8 @@
     dr: { c: "#8f9894", w: 1.4, dash: "5 4" },
   };
   const DASH = { droid_mono_rgb: "6 3", vggtslam2_mono_rgb: "2 3", orbslam3_mono_rgb: "1 4", breezyslam_d435depth: "8 2 2 2" };
-  const style = t => ({ ...(ROLE[t.role] || ROLE.baseline), ...(t.role === "baseline" && DASH[t.key] ? { dash: DASH[t.key] } : {}) });
+  const VGGT = { c: "#4a90e2", w: 1.6, dash: "" };              // the best independent method: solid blue, as in the video
+  const style = t => t.key === "vggtslam2_mono_rgb" ? VGGT : ({ ...(ROLE[t.role] || ROLE.baseline), ...(t.role === "baseline" && DASH[t.key] ? { dash: DASH[t.key] } : {}) });
   const el = (n, a, parent) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); (parent || svg).appendChild(e); return e; };
   fetch("assets/realworld/slam.json").then(r => r.json()).then(D => {
     const W = 760, H = 560, pad = 28;
@@ -62,7 +66,7 @@
     const rt = D.tracks.find(t => t.key === D.reference) || tracks[0];
     const s0 = P(rt.x[0], rt.y[0]);
     el("circle", { cx: s0[0], cy: s0[1], r: 6, fill: "none", stroke: "#f4efe6", "stroke-width": 2 });
-    el("text", { x: s0[0] + 10, y: s0[1] + 4, fill: "#f4efe6", "font-size": 12 }).textContent = "start";
+    el("text", { x: s0[0] + 2, y: s0[1] - 10, fill: "#f4efe6", "font-size": 12, stroke: "#171a1b", "stroke-width": 4, "paint-order": "stroke" }).textContent = "start";
     // legend (always, >= 2 series) + table
     const tableRows = [];
     tracks.slice().reverse().forEach(t => {
@@ -81,15 +85,18 @@
       const mono = t.scale_given_by_alignment;   // monocular: no metric scale, so the alignment supplies it
       const partial = t.coverage < 0.5;
       if (partial) tr.className = (tr.className + " partial").trim();
-      [t.label + (mono ? " · scale given by alignment" : "") + (partial ? " · partial" : ""),
+      [t.label + (mono ? " †" : ""),
        Math.round(t.coverage * 100) + " % (" + t.seconds_tracked.toFixed(0) + " s)",
        ref ? "–" : (mono ? skillText(t, D) : sgn(t.skill_sim2 ?? t.skill)),
        // one run on both skill columns (the same run the scale-fitted column shows); repeats are named, never mixed in
-       ref || mono ? "–" : sgn(t.skill) + ((D.repeats || {})[t.key]?.n > 1 ? ` · ${D.repeats[t.key].n} runs ${skillText(t, D).split(" (")[0]}` : ""),
+       ref || mono ? "–" : sgn(t.skill),
        ref ? "reference" : t.rms_m.toFixed(2) + " m",
-       mono ? "–" : t.path_m.toFixed(1) + " m", mono ? "n/a" : t.path_ratio.toFixed(2)]
+       mono ? "n/a" : t.path_ratio.toFixed(2)]
         .forEach((c, i) => { const td = document.createElement("td"); td.textContent = c; if (i) td.className = "n";
-          if (i === 2 && !ref && !mono) { const sp = document.createElement("span"); sp.className = "on"; sp.textContent = ` (rigid ${sgn(t.skill)})`; td.appendChild(sp); }
+          if (i === 0) {                                            // suffixes hidden on a phone (class sfx)
+            const r = (D.repeats || {})[t.key], rig = r && r.n > 1 && !mono && !ref ? ` (rigid over ${r.n} runs ${sgn(r.skill_mean)} ± ${r.skill_sd.toFixed(3)})` : "";
+            const sx = document.createElement("span"); sx.className = "sfx"; sx.textContent = runsText(t, D) + rig + (partial ? " · partial" : ""); td.appendChild(sx); }
+          if (i === 2 && !ref && !mono) { const sp = document.createElement("span"); sp.className = "on rig"; sp.textContent = `rigid ${sgn(t.skill)}`; td.appendChild(sp); }
           tr.appendChild(td); });
       const ours = t.key.startsWith("ours_");
       const grp = ref ? 0 : partial ? 3 : ours ? 2 : 1;            // reference, independent, our stack's arms, partial
