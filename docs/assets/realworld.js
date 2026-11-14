@@ -66,7 +66,7 @@
     const rt = D.tracks.find(t => t.key === D.reference) || tracks[0];
     const s0 = P(rt.x[0], rt.y[0]);
     el("circle", { cx: s0[0], cy: s0[1], r: 6, fill: "none", stroke: "#f4efe6", "stroke-width": 2 });
-    el("text", { x: s0[0] + 2, y: s0[1] - 10, fill: "#f4efe6", "font-size": 12, stroke: "#171a1b", "stroke-width": 4, "paint-order": "stroke" }).textContent = "start";
+    el("text", { x: s0[0] + 10, y: s0[1] - 16, fill: "#f4efe6", "font-size": 12, stroke: "#171a1b", "stroke-width": 6, "paint-order": "stroke" }).textContent = "start";
     // legend (always, >= 2 series) + table
     const tableRows = [];
     tracks.slice().reverse().forEach(t => {
@@ -119,8 +119,11 @@
     tableRows.sort((a, b) => a.grp - b.grp || b.sk - a.sk).forEach(x => {
       if (x.grp === 3 && lastGrp !== 3) {                     // full-drive rows end here: the toggle, then the partial tracks
         if (!toggled) { rows.appendChild(toggle()); toggled = true; }
-        rows.appendChild(sep("Partial tracks (at most 23 % of the drive): not rankable against full-drive skill")); }
-      lastGrp = x.grp; if (x.abl) x.tr.classList.add("abl"); rows.appendChild(x.tr); });
+        const ps = sep("Partial tracks (at most 23 % of the drive): not rankable against full-drive skill ");
+        const pb = document.createElement("button"); pb.type = "button"; pb.className = "rw-key prt-btn"; pb.textContent = "show";
+        pb.addEventListener("click", () => { const t = rows.closest("table"); t.classList.toggle("showprt"); pb.textContent = t.classList.contains("showprt") ? "hide" : "show"; });
+        ps.firstChild.appendChild(pb); rows.appendChild(ps); }                // the button shows on a phone only (prt-btn)
+      lastGrp = x.grp; if (x.abl) x.tr.classList.add("abl"); if (x.grp === 3) x.tr.classList.add("prt"); rows.appendChild(x.tr); });
     if (!toggled) rows.appendChild(toggle());
     // time-linked hover: nearest point on any track -> every track's position at that time
     const T = tracks[0].t;

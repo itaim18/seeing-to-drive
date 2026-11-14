@@ -311,6 +311,7 @@
     #realworld .oblegend p { margin: 6px 0; }
     #realworld table.bench td.n, #realworld table.bench th.n { padding-left: 28px; }
     #realworld tr.abl { display: none; } #realworld table.showabl tr.abl { display: table-row; }
+    #realworld .prt-btn { display: none; }
     #realworld .rw-legend .rw-key.more { display: none; } #realworld .rw-legend.all .rw-key.more { display: inline-flex; }
     #realworld table.bench th { white-space: normal; }
     @media (min-width: 601px) { #realworld table.bench { table-layout: fixed; } #realworld table.bench th:first-child { width: 32%; }
@@ -337,6 +338,8 @@
       #realworld table.hitl td:first-child { width: 50%; }
       #realworld .rw-legend { max-height: none; overflow: visible; }
       #realworld table.hitl td.n { white-space: normal; font-size: .72rem; }
+      #realworld .prt-btn { display: inline-block; }
+      #realworld tr.prt { display: none; } #realworld table.showprt tr.prt { display: table-row; }
       #rw-chart text { font-size: 26px; }
       #rw-chart polyline { vector-effect: non-scaling-stroke; }
     }
@@ -415,13 +418,12 @@
     <ul class="rw-notes" style="margin-top:10px">
       <li><b>Ours and the vendor's model are not resolvably different on these mostly-ground points</b> (paired over frames +0.017, against 0.028 between the table's point means; 95&nbsp;% CI
         &minus;0.060 to +0.118, p&nbsp;=&nbsp;0.70; with 10-s blocks of the drive as the unit, from inverting the exact sign-flip test, &minus;0.040 to +0.075; on |log(predicted/true)| +0.009,
-        CI &minus;0.012 to +0.032). The interval bounds any advantage of ours at 0.060 (0.040 with blocks), against the simulator's 0.084 (95&nbsp;% CI 0.060&ndash;0.113 over its 104 runs; paired over the 397 frames both scored, 0.270 vs 0.354; the headline 0.269 is over 399
-        all-pixel AbsRel on held-out simulated frames of the yard the student was fine-tuned on, a different metric), so the block bound lies below that interval; in relative terms the real bound (23&nbsp;%) overlaps the simulator's 18&ndash;30&nbsp;%, but the real estimate is &minus;8&nbsp;%
+        CI &minus;0.012 to +0.032). The interval bounds any advantage of ours at 0.060 (0.040 with blocks), against the simulator's 0.084 (95&nbsp;% CI 0.060&ndash;0.113 over its 104 runs; paired over the 397 frames both scored, 0.270 vs 0.354, all-pixel AbsRel (the headline 0.269 is over all 399 frames) on held-out simulated frames of the yard the student was fine-tuned on, a different metric), so the block bound lies below that interval; in relative terms the real bound (23&nbsp;%) overlaps the simulator's 18&ndash;30&nbsp;%, but the real estimate is &minus;8&nbsp;%
         (95&nbsp;% CI &minus;30 to +23&nbsp;%): one drive cannot decide;
         on the set rebuilt without Fast-FoundationStereo the absolute bound does not hold either (ours &minus;0.061, block p&nbsp;=&nbsp;0.078, carried by the
         zoo model's blow-ups; on |log| not resolved, CI &minus;0.030 to +0.017).</li>
       <li><b>On obstacles the simulator's advantage is not shown.</b> In simulation ours led on obstacle pixels within 3&nbsp;m (AbsRel
-        0.197 vs 0.334). On points at least 0.15&nbsp;m above each frame's floor plane
+        0.197 vs 0.334; 213 vs 193 frames, unpaired). On points at least 0.15&nbsp;m above each frame's floor plane
         (trunks, benches, bushes, people; 319 points, 87 frames; a stratum added after the main result, at a review's request),
         scored on |log(predicted/true)| because a few blow-ups rule the mean there, ours leans ahead of the zoo model by &minus;0.165
         (frames as units p&nbsp;=&nbsp;0.012; with 10-s blocks exact p&nbsp;=&nbsp;0.046, which is 0.14 corrected over the five tests on
