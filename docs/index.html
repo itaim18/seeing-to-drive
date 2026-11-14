@@ -300,7 +300,7 @@
     #realworld details { margin-top: 22px; }
     #realworld .on { display: none; color: var(--soft); }
     #realworld summary { cursor: pointer; font-weight: 600; }
-    #realworld details.stats { margin-top: 8px; } #realworld details.stats summary { font-weight: 500; color: var(--soft); font-size: .95rem; }
+    #realworld details.stats { margin-top: 8px; padding: 0 15px; } #realworld .table-scroll + details.stats { margin-bottom: 16px; } #realworld details.stats summary { font-weight: 500; color: var(--soft); font-size: .95rem; }
     #realworld th { text-transform: none; letter-spacing: 0.01em; }      /* uppercase turned the delta of delta_1 into a Delta */
     #realworld tr.sep td { font-family: inherit; text-transform: none; letter-spacing: 0; font-size: .85rem; }
     #realworld figcaption { max-width: 72ch; }
@@ -415,12 +415,13 @@
     <ul class="rw-notes" style="margin-top:10px">
       <li><b>Ours and the vendor's model are not resolvably different on these mostly-ground points</b> (paired over frames +0.017, against 0.028 between the table's point means; 95&nbsp;% CI
         &minus;0.060 to +0.118, p&nbsp;=&nbsp;0.70; with 10-s blocks of the drive as the unit, from inverting the exact sign-flip test, &minus;0.040 to +0.075; on |log(predicted/true)| +0.009,
-        CI &minus;0.012 to +0.032). The interval bounds any advantage of ours at 0.060 (0.040 with blocks), against the simulator's 0.084 (95&nbsp;% CI 0.060&ndash;0.113 over its 104 runs; paired over 397 frames, 0.270 vs 0.354
+        CI &minus;0.012 to +0.032). The interval bounds any advantage of ours at 0.060 (0.040 with blocks), against the simulator's 0.084 (95&nbsp;% CI 0.060&ndash;0.113 over its 104 runs; paired over the 397 frames both scored, 0.270 vs 0.354; the headline 0.269 is over 399
         all-pixel AbsRel on held-out simulated frames of the yard the student was fine-tuned on, a different metric), so the block bound lies below that interval; in relative terms the real bound (23&nbsp;%) overlaps the simulator's 18&ndash;30&nbsp;%, but the real estimate is &minus;8&nbsp;%
         (95&nbsp;% CI &minus;30 to +23&nbsp;%): one drive cannot decide;
         on the set rebuilt without Fast-FoundationStereo the absolute bound does not hold either (ours &minus;0.061, block p&nbsp;=&nbsp;0.078, carried by the
         zoo model's blow-ups; on |log| not resolved, CI &minus;0.030 to +0.017).</li>
-      <li><b>On obstacles the simulator's advantage is not shown.</b> On points at least 0.15&nbsp;m above each frame's floor plane
+      <li><b>On obstacles the simulator's advantage is not shown.</b> In simulation ours led on obstacle pixels within 3&nbsp;m (AbsRel
+        0.197 vs 0.334). On points at least 0.15&nbsp;m above each frame's floor plane
         (trunks, benches, bushes, people; 319 points, 87 frames; a stratum added after the main result, at a review's request),
         scored on |log(predicted/true)| because a few blow-ups rule the mean there, ours leans ahead of the zoo model by &minus;0.165
         (frames as units p&nbsp;=&nbsp;0.012; with 10-s blocks exact p&nbsp;=&nbsp;0.046, which is 0.14 corrected over the five tests on
@@ -455,7 +456,7 @@
         stereo's (median over 931 frames of each frame's ray-by-ray gap; 29&nbsp;% pooled over 28,616 rays); the
         median signed gap is &minus;7&nbsp;%, the network placing obstacle bases a little nearer. Both
         come from ground-contact geometry and the camera height, with the onboard stack's nominal intrinsics; re-scored with the factory
-        principal point (5.6&nbsp;px lower) the gap is 26&nbsp;% over 982 frames (signed &minus;13&nbsp;%), so its size does not come from the nominal intrinsics. Inside 1&nbsp;m both mark grass as obstacles, in different places: the stereo marks
+        principal point (5.6&nbsp;px lower) the gap is 26&nbsp;% over 982 frames (signed &minus;13&nbsp;%), so its size does not come from the nominal intrinsics (camera pitch and roll are uncalibrated: not a calibrated range error). Inside 1&nbsp;m both mark grass as obstacles, in different places: the stereo marks
         63&nbsp;% of image columns blocked, the network 41&nbsp;%. Neither is right on grass, which this car drives straight over.</li>
       <li><b>Seen from above.</b> Of the 10&nbsp;cm cells in which either map holds a point at least 0.15&nbsp;m above the ground, the stereo
         marks 86&nbsp;% and the network 39&nbsp;% (both 25&nbsp;%): the network finds 29&nbsp;% of the stereo's cells, and 63&nbsp;% of its own are
@@ -480,12 +481,8 @@
     <div class="chart-head"><h3>Where each method thinks the car went</h3></div>
     <p class="tip" style="margin:0 0 6px">The yardstick (white) is an <em>independent</em> metric system: RTAB-Map on the RealSense's own
       infrared image and stereo depth, one graph over 97&nbsp;% of the recorded frames (four loop closures, 47 odometry resets). Skill =
-      1 &minus; RMS / RMS of standing still: agreement, not accuracy, from one drive. Methods run three times show mean &plusmn; sd (&dagger;: monocular, its scale given by the alignment).
-      Monocular methods get a similarity alignment, under which skill cannot fall below 0; scored the same way, ours as deployed
-      reaches +0.10 and the commands alone +0.08. The
-      reference's three re-runs differ from it by 0.64&ndash;0.79&nbsp;m RMS and from each other by 0.33&ndash;0.49&nbsp;m; scored against
-      any of the four runs, no skill moves by more than 0.06 and no ranking among full-coverage methods changes. Skill on a partial overlap does not rank
-      against skill over the whole drive. Click a method to show or hide it.</p>
+      1 &minus; RMS / RMS of standing still: agreement, not accuracy, from one drive (&dagger;: monocular, its scale given by the alignment).
+      Click a method to show or hide it.</p>
     <div class="rw-legend" id="rw-legend"></div>
     <svg id="rw-chart" viewBox="0 0 760 560" role="img" aria-label="Trajectories of the same drive estimated by each method, aligned to the reference"></svg>
     <p class="tip" id="rw-tip">Hover a track: dots mark every method's position at that same moment.</p>
@@ -503,6 +500,11 @@
     </ul>
     <details class="stats"><summary>The numbers behind these points: reference checks, gates, runs</summary>
     <ul class="rw-notes" style="margin-top:10px">
+      <li><b>How skill is scored.</b> Methods run three times show mean &plusmn; sd. Monocular methods get a similarity alignment,
+        under which skill cannot fall below 0; scored the same way, ours as deployed reaches +0.10 and the commands alone +0.08.
+        The reference's three re-runs differ from it by 0.64&ndash;0.79&nbsp;m RMS and from each other by 0.33&ndash;0.49&nbsp;m; scored
+        against any of the four runs, no skill moves by more than 0.06 and no ranking among full-coverage methods changes. Skill on
+        a partial overlap does not rank against skill over the whole drive.</li>
       <li><b>As deployed, depth barely enters our trajectory.</b> Our stack measured the drive 2.3&times; too short: a plausibility gate
         in its camera odometry rejected any motion faster than 1.08&nbsp;m/s (1.5&times; the <em>simulated</em> car's 0.72&nbsp;m/s top speed), throwing away 23&nbsp;% of frames,
         exactly the fast ones (the odometry's own 90th-percentile speed on this drive is 2.9&nbsp;m/s). A physical bound fixes the scale
