@@ -312,6 +312,9 @@
     #realworld table.bench td.n, #realworld table.bench th.n { padding-left: 28px; }
     #realworld tr.abl { display: none; } #realworld table.showabl tr.abl { display: table-row; }
     #realworld .prt-btn { display: none; }
+    #realworld tr.more-model { display: none; } #realworld table.showall tr.more-model { display: table-row; }
+    #realworld .rw-nav { margin: 10px 0 0; font-size: .95rem; } #realworld .rw-nav a { margin-right: 14px; }
+    #realworld .ph-grid { display: none; }
     #realworld .rw-legend .rw-key.more { display: none; } #realworld .rw-legend.all .rw-key.more { display: inline-flex; }
     #realworld table.bench th { white-space: normal; }
     @media (min-width: 601px) { #realworld table.bench { table-layout: fixed; } #realworld table.bench th:first-child { width: 32%; }
@@ -339,6 +342,7 @@
       #realworld .rw-legend { max-height: none; overflow: visible; }
       #realworld table.hitl td.n { white-space: normal; font-size: .72rem; }
       #realworld .prt-btn { display: inline-block; }
+      #realworld .ph-grid { display: block; width: 100%; border-radius: 10px; margin: 10px 0 0; }
       #realworld tr.prt { display: none; } #realworld table.showprt tr.prt { display: table-row; }
       #rw-chart text { font-size: 26px; }
       #rw-chart polyline { vector-effect: non-scaling-stroke; }
@@ -352,12 +356,14 @@
       There is no ground truth on this drive, so every real number below is agreement with an independent reference; questions
       that need ground truth go to the hardware-in-the-loop simulator.</p>
   </div>
+  <p class="rw-nav"><a href="#rw-depth">Depth</a><a href="#rw-obstacles">Obstacles and range</a><a href="#rw-slam">SLAM</a><a href="#rw-sim">Simulator</a></p>
   <figure class="figure" style="margin-top:0">
+    <img class="ph-grid" src="assets/realworld/phone_grid.jpg" width="1280" height="720" alt="Four key frames of the video: the drive, the obstacle cells from above, SLAM against the reference, the end card" loading="lazy">
     <video src="assets/realworld/drive.mp4" controls playsinline muted preload="metadata" poster="assets/realworld/drive_poster.jpg"
       style="width:100%;border-radius:14px;display:block;background:#0b0e10"></video>
-    <figcaption>Both panels follow the drive from the same reference poses (RTAB-Map's position and heading), behind the car's real 3-D model, so the
-      depth and the level-camera geometry are what differ (these 3-D panels place both clouds with a level camera, so the stereo's ground tilts up about 7&nbsp;cm per metre; the top-down
-      obstacle comparison uses the measured camera mount). Each map is that source's own depth turned into a colour point cloud (left: the RealSense stereo; right: our
+    <figcaption>Both panels follow the drive from the same reference poses (RTAB-Map's position and heading), behind the car's real 3-D model, so only the
+      depth differs: both the 3-D panels and the top-down obstacle comparison place the clouds with the camera mount measured from
+      the stereo floor (3.8&deg; down). Each map is that source's own depth turned into a colour point cloud (left: the RealSense stereo; right: our
       network, at the scale the car itself uses), growing as the car drives; where the depths disagree, the maps differ. The cone
       ahead of the car is its camera's view with the live frame on it; cyan lines are this frame's pseudo-lidar rays. The line under
       the maps is the median range gap between the two scans for obstacles beyond 1&nbsp;m (and whether the network reads farther or
@@ -378,7 +384,7 @@
     </ul>
   </div>
 
-  <div class="panel" style="margin-top:22px">
+  <div class="panel" id="rw-depth" style="margin-top:22px">
     <h3 style="margin-top:0">Depth on 1,000 stereo-verified points</h3>
     <p class="tip" style="margin:0 0 10px">Reference: three different stereo matchers on the same infrared pair must agree within
       2&nbsp;% + 1&nbsp;% per metre, between 0.3 and 3&nbsp;m. 1,000 such points, stratified across five distance bins from 309 frames, are
@@ -386,24 +392,25 @@
       on other points of the same frame. Stereo rows are agreement among matchers, not accuracy (method details below).</p>
     <div class="table-scroll"><table class="bench"><thead><tr><th>Depth source</th><th>Runs on</th><th class="n">AbsRel · per frame</th><th class="n">&delta;1</th><th class="n">AbsRel · one scale per drive</th><th class="n">Raw metric: pred / true</th></tr></thead><tbody>
 <tr><td>Depth Anything 3-Large<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.101</td><td class="n">0.90</td><td class="n">0.418</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything 3-Mono-Large<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.107</td><td class="n">0.88</td><td class="n">0.359</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything 3-Base<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.110</td><td class="n">0.87</td><td class="n">0.408</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything 3-Small<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.115</td><td class="n">0.86</td><td class="n">0.390</td><td class="n">&ndash;</td></tr>
+<tr class="more-model"><td>Depth Anything 3-Mono-Large<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.107</td><td class="n">0.88</td><td class="n">0.359</td><td class="n">&ndash;</td></tr>
+<tr class="more-model"><td>Depth Anything 3-Base<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.110</td><td class="n">0.87</td><td class="n">0.408</td><td class="n">&ndash;</td></tr>
+<tr class="more-model"><td>Depth Anything 3-Small<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.115</td><td class="n">0.86</td><td class="n">0.390</td><td class="n">&ndash;</td></tr>
 <tr><td>Depth Anything V2-S<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.160</td><td class="n">0.82</td><td class="n">0.427</td><td class="n">&ndash;</td></tr>
 <tr><td>Depth Anything V2-L (teacher)<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.170</td><td class="n">0.84</td><td class="n">0.422</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Anything V2-B<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.181</td><td class="n">0.83</td><td class="n">0.426</td><td class="n">&ndash;</td></tr>
-<tr><td>Depth Pro<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.202</td><td class="n">0.65</td><td class="n">0.402</td><td class="n">&times;2.0</td></tr>
+<tr class="more-model"><td>Depth Anything V2-B<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.181</td><td class="n">0.83</td><td class="n">0.426</td><td class="n">&ndash;</td></tr>
+<tr class="more-model"><td>Depth Pro<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.202</td><td class="n">0.65</td><td class="n">0.402</td><td class="n">&times;2.0</td></tr>
 <tr><td>MoGe-3<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.205</td><td class="n">0.62</td><td class="n">0.261</td><td class="n">&times;3.5</td></tr>
-<tr><td>MoGe-2<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.207</td><td class="n">0.63</td><td class="n">0.262</td><td class="n">&times;3.3</td></tr>
-<tr><td>Depth Anything 3-Metric-Large<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.222</td><td class="n">0.58</td><td class="n">0.297</td><td class="n">&times;2.4</td></tr>
-<tr><td>UniDepthV2-L<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.222</td><td class="n">0.61</td><td class="n">0.305</td><td class="n">&times;1.7</td></tr>
+<tr class="more-model"><td>MoGe-2<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.207</td><td class="n">0.63</td><td class="n">0.262</td><td class="n">&times;3.3</td></tr>
+<tr class="more-model"><td>Depth Anything 3-Metric-Large<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.222</td><td class="n">0.58</td><td class="n">0.297</td><td class="n">&times;2.4</td></tr>
+<tr class="more-model"><td>UniDepthV2-L<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.222</td><td class="n">0.61</td><td class="n">0.305</td><td class="n">&times;1.7</td></tr>
 <tr><td>DAv2-S, Hailo Model Zoo <span style="color:var(--soft)">(the comparison)</span><span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.234</td><td class="n">0.74</td><td class="n">0.432</td><td class="n">&ndash;</td></tr>
-<tr><td>Ours, replayed on the chip</td><td>Hailo-8L int8</td><td class="n">0.258</td><td class="n">0.74</td><td class="n">0.413</td><td class="n">&ndash;</td></tr>
-<tr><td>Ours, float twin<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.258</td><td class="n">0.75</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
+<tr class="more-model"><td>Ours, replayed on the chip</td><td>Hailo-8L int8</td><td class="n">0.258</td><td class="n">0.74</td><td class="n">0.413</td><td class="n">&ndash;</td></tr>
+<tr class="more-model"><td>Ours, float twin<span class="on"> · GPU</span></td><td>GPU</td><td class="n">0.258</td><td class="n">0.75</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
 <tr class="ours"><td><b>Ours, live on the chip</b><span class="sfx"> (distilled student v5)</span></td><td>Hailo-8L int8</td><td class="n">0.262</td><td class="n">0.73</td><td class="n">0.410</td><td class="n">&ndash;</td></tr>
 <tr><td>SC-DepthV3, Hailo Model Zoo<span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.392</td><td class="n">0.22</td><td class="n">0.435</td><td class="n">&ndash;</td></tr>
 <tr><td>FastDepth, Hailo Model Zoo<span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.394</td><td class="n">0.23</td><td class="n">0.415</td><td class="n">&ndash;</td></tr>
-<tr><td>DAv2-S, our int8 build<span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.443</td><td class="n">0.58</td><td class="n">0.439</td><td class="n">&ndash;</td></tr>
+<tr class="more-model"><td>DAv2-S, our int8 build<span class="on"> · chip</span></td><td>Hailo-8L int8</td><td class="n">0.443</td><td class="n">0.58</td><td class="n">0.439</td><td class="n">&ndash;</td></tr>
+<tr class="sep"><td colspan="6"><button type="button" class="rw-key" onclick="this.closest('table').classList.toggle('showall');this.textContent=this.closest('table').classList.contains('showall')?'Show the eight in the video':'Show all 19 models'">Show all 19 models</button></td></tr>
 <tr class="sep"><td colspan="6" style="color:var(--soft)">Stereo, below: each matcher scored leave-one-out against the other two, on its own points in the infrared frame, holes excluded. Agreement among matchers on the same images, not comparable with the rows above.</td></tr>
 <tr><td>RealSense D435 on-chip stereo <span style="color:var(--soft)">(no depth on 5% of points)</span></td><td>stereo</td><td class="n">0.009</td><td class="n">1.00</td><td class="n">&ndash;</td><td class="n">metric</td></tr>
 <tr><td>OpenCV SGBM on the IR pair <span style="color:var(--soft)">(no depth on 17% of points)</span></td><td>stereo</td><td class="n">0.010</td><td class="n">1.00</td><td class="n">&ndash;</td><td class="n">metric</td></tr>
@@ -447,7 +454,7 @@
     </details>
   </div>
 
-  <div class="panel" style="margin-top:22px">
+  <div class="panel" id="rw-obstacles" style="margin-top:22px">
     <h3 style="margin-top:0">Obstacles and range: the same poses, two depths</h3>
     <ul class="rw-notes leads" style="margin-top:0">
       <li><b>Beyond 1&nbsp;m the network places obstacle bases within a median 25&nbsp;% of the stereo</b>, a little nearer (signed &minus;7&nbsp;%).</li>
@@ -485,7 +492,7 @@
     </div>
   </div>
 
-  <div class="panel" style="margin-top:22px">
+  <div class="panel" id="rw-slam" style="margin-top:22px">
     <div class="chart-head"><h3>Where each method thinks the car went</h3></div>
     <p class="tip" style="margin:0 0 6px">The yardstick (white) is an <em>independent</em> metric system: RTAB-Map on the RealSense's own
       infrared image and stereo depth, one graph over 97&nbsp;% of the recorded frames (four loop closures, 47 odometry resets). Skill =
@@ -539,7 +546,7 @@
     </details>
   </div>
 
-  <div class="panel" style="margin-top:22px">
+  <div class="panel" id="rw-sim" style="margin-top:22px">
     <h3 style="margin-top:0">Scale matters most (simulator, one loop): <span class="sfx">exact depth with the true scale </span><span style="white-space:nowrap">0.074&nbsp;m</span><span class="sfx">; camera arms without it</span><span class="on"> vs</span> <span style="white-space:nowrap">0.42&ndash;0.84&nbsp;m</span></h3>
     <p class="tip" style="margin:0 0 10px">In the hardware-in-the-loop simulator the car drove a loop twice under three lighting
       presets, carrying a simulated RealSense infrared pair (SGBM), a planar lidar ring and exact depth. Every source went through
