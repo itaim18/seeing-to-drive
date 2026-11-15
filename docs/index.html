@@ -314,7 +314,7 @@
     #realworld .prt-btn { display: inline-block; }
     #realworld tr.prt { display: none; } #realworld table.showprt tr.prt { display: table-row; }
     #realworld tr.more-model { display: none; } #realworld table.showall tr.more-model { display: table-row; }
-    #realworld .rw-nav { margin: 12px 0 16px; font-size: .95rem; } #realworld .rw-nav a { margin-right: 8px; padding: 3px 12px; border: 1px solid rgba(244,239,230,.25); border-radius: 999px; text-decoration: none; display: inline-block; margin-bottom: 6px; }
+    #realworld .rw-nav { margin: 12px 0 16px; font-size: .95rem; display: flex; flex-wrap: wrap; gap: 6px 8px; } #realworld .rw-nav a { margin: 0; padding: 3px 12px; border: 1px solid rgba(244,239,230,.25); border-radius: 999px; text-decoration: none; display: inline-block; }
     #realworld .ph-grid { display: none; }
     #realworld .rw-legend .rw-key.more { display: none; } #realworld .rw-legend.all .rw-key.more { display: inline-flex; }
     #realworld table.bench th { white-space: normal; }
@@ -363,7 +363,7 @@
       style="width:100%;border-radius:14px;display:block;background:#0b0e10"></video>
     <figcaption>Both panels follow the drive from the same reference poses (RTAB-Map's position and heading), behind the car's real 3-D model, so only the
       depth differs. About 143&nbsp;s in, the video pauses for 2&nbsp;s on a bench straight ahead: the drive's largest straight-ahead disagreement
-      (+41&nbsp;% on that frame, +23&nbsp;% over its 0.4&nbsp;s); most frames differ far less (median +8&nbsp;%, 157 frames).<span class="on"> The four
+      (+41&nbsp;% on that frame, +23&nbsp;% over its 0.4&nbsp;s); most differ far less (median +8&nbsp;% over the 157 frames with an obstacle straight ahead).<span class="on"> The four
       stills above show the key frames; watch the video full-screen in landscape.</span>
       <details class="stats cap-more"><summary>How to read the video</summary>Both the 3-D panels and the top-down obstacle comparison place the clouds
       with the camera mount measured from the stereo floor (3.8&deg; down). Each map is that source's own depth turned into a colour point cloud (left: the
