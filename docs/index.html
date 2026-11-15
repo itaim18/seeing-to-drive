@@ -356,7 +356,7 @@
     <video src="assets/realworld/drive.mp4" controls playsinline muted preload="metadata" poster="assets/realworld/drive_poster.jpg"
       style="width:100%;border-radius:14px;display:block;background:#0b0e10"></video>
     <figcaption>Both panels follow the drive from the same reference poses (RTAB-Map's position and heading), behind the car's real 3-D model, so the
-      depth is what differs (these 3-D panels place both clouds with a level camera, so the stereo's ground tilts up about 7&nbsp;cm per metre; the top-down
+      depth and the level-camera geometry are what differ (these 3-D panels place both clouds with a level camera, so the stereo's ground tilts up about 7&nbsp;cm per metre; the top-down
       obstacle comparison uses the measured camera mount). Each map is that source's own depth turned into a colour point cloud (left: the RealSense stereo; right: our
       network, at the scale the car itself uses), growing as the car drives; where the depths disagree, the maps differ. The cone
       ahead of the car is its camera's view with the live frame on it; cyan lines are this frame's pseudo-lidar rays. The line under
