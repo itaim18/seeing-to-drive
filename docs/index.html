@@ -379,8 +379,8 @@
         Depth Anything V2-S 0.234: not resolvably different (95&nbsp;% CI &minus;0.060 to +0.118).</li>
       <li><b>Obstacles:</b> the simulator's advantage is not shown (an exploratory lean: after correction p&nbsp;=&nbsp;0.046 or 0.14, depending on which
         tests are grouped; details below).</li>
-      <li><b>Range:</b> beyond 1&nbsp;m the network's obstacle range is within a median 25&nbsp;% of the RealSense's
-        (signed &minus;7&nbsp;%: a little nearer).</li>
+      <li><b>Range:</b> beyond 1&nbsp;m, where the onboard rule flags an obstacle base in each depth, the network's flags are within a median
+        25&nbsp;% of the RealSense's (signed &minus;7&nbsp;%: a little nearer); most flags sit on uneven ground, not raised obstacles.</li>
       <li><b>SLAM:</b> VGGT-SLAM 2.0 agrees with the independent reference (skill +0.80); ours +0.10, the commands alone +0.08
         (same scale-fitting alignment; one run: a 0.02 gap, not a lead). As deployed, depth barely enters our trajectory.</li>
       <li><b>With ground truth (simulator):</b> our SLAM needs a better scale than its per-frame floor fit: for exact depth on one simulated loop, the true scale cuts the
@@ -461,14 +461,17 @@
   <div class="panel" id="rw-obstacles" style="margin-top:22px">
     <h3 style="margin-top:0">Obstacles and range: the same poses, two depths</h3>
     <ul class="rw-notes leads" style="margin-top:0">
-      <li><b>Beyond 1&nbsp;m the network places obstacle bases within a median 25&nbsp;% of the stereo</b>, a little nearer (signed &minus;7&nbsp;%).</li>
+      <li><b>Beyond 1&nbsp;m, where the onboard rule flags an obstacle base, the network's flags are within a median 25&nbsp;% of the stereo's</b>, a little
+        nearer (signed &minus;7&nbsp;%); 86&nbsp;% of the stereo's flags sit on ground under 5&nbsp;cm or holes, so this compares where the rule fires, not raised obstacles.</li>
       <li><b>Seen from above, the two depths mark mostly different obstacle cells</b>: 16&nbsp;% of the cells either marks are marked by both (network 77&nbsp;%, stereo 39&nbsp;%).</li>
     </ul>
     <details class="stats"><summary>The numbers behind these points: rays, cells, calibration</summary>
     <ul class="rw-notes" style="margin-top:10px">
-      <li><b>Range from the same poses.</b> Where both see an obstacle beyond 1&nbsp;m, the network's range is within 25&nbsp;% of the
+      <li><b>Range from the same poses.</b> Where the onboard rule flags an obstacle base in both depths beyond 1&nbsp;m, the network's range is within 25&nbsp;% of the
         stereo's (median over 931 frames of each frame's ray-by-ray gap; 29&nbsp;% pooled over 28,616 rays); the
-        median signed gap is &minus;7&nbsp;%, the network placing obstacle bases a little nearer. Both
+        median signed gap is &minus;7&nbsp;%, the network's flags a little nearer. An exploratory diagnostic read the scan's detectors and classified each flagged run by the
+        full-resolution stereo at its pixels: of the 26,142 stereo flags the gap uses, 85&nbsp;% lie under 5&nbsp;cm above the stereo's fitted
+        floor, 1&nbsp;% on holes, 7&nbsp;% on raised points (the rest from the overhang detector). Both ranges
         come from ground-contact geometry and the camera height, with the onboard stack's nominal intrinsics; re-scored with the factory
         principal point (5.6&nbsp;px lower) the gap is 26&nbsp;% over 982 frames (signed &minus;13&nbsp;%), so its size does not come from the nominal intrinsics. The mount, measured from the stereo floor, is pitched 3.8&deg; down and rolled
         &minus;1.4&deg; at 0.168&nbsp;m (the onboard geometry assumes 0&deg;, 0&deg;, 0.158&nbsp;m); imposed on the onboard geometry the gap stays at 26&nbsp;%, but the
