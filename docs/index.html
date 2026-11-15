@@ -362,15 +362,16 @@
     <video src="assets/realworld/drive.mp4" controls playsinline muted preload="metadata" poster="assets/realworld/drive_poster.jpg"
       style="width:100%;border-radius:14px;display:block;background:#0b0e10"></video>
     <figcaption>Both panels follow the drive from the same reference poses (RTAB-Map's position and heading), behind the car's real 3-D model, so only the
-      depth differs. About 143&nbsp;s in, the video pauses for 2&nbsp;s on a bench straight ahead: the drive's largest straight-ahead disagreement
-      (+41&nbsp;% on that frame, +23&nbsp;% over its 0.4&nbsp;s); most differ far less (median +8&nbsp;% over the 157 frames with an obstacle straight ahead).<span class="on"> The four
+      depth differs. About 143&nbsp;s in, the video pauses for 2&nbsp;s on the drive's largest straight-ahead disagreement between the onboard
+      scans (+41&nbsp;% on that frame, +23&nbsp;% over its 0.4&nbsp;s; median +8&nbsp;% over the 157 frames with a flag straight ahead): at a bench
+      1.00&nbsp;m away by the stereo's metric depth, the stereo scan reads 1.25&nbsp;m on its seat (overhang rule), the network's 1.77&nbsp;m on the ground (vertical-face rule).<span class="on"> The four
       stills above show the key frames; watch the video full-screen in landscape.</span>
       <details class="stats cap-more"><summary>How to read the video</summary>Both the 3-D panels and the top-down obstacle comparison place the clouds
       with the camera mount measured from the stereo floor (3.8&deg; down). Each map is that source's own depth turned into a colour point cloud (left: the
       RealSense stereo; right: our network, at the scale the car itself uses), growing as the car drives; where the depths disagree, the maps differ. The cone
       ahead of the car is its camera's view with the live frame on it; cyan lines are this frame's pseudo-lidar rays (the deployed geometry). The line under
-      the maps is the median range gap between the two scans for obstacles beyond 1&nbsp;m; the timeline carries each frame's gap. The paused bench's ranges
-      (1.25 vs 1.77&nbsp;m) are scan ranges in that deployed geometry; with the measured mount the stereo puts it at 1.00&nbsp;m. People are
+      the maps is the median range gap between the two scans for obstacles beyond 1&nbsp;m; the timeline carries each frame's gap. The paused ranges are
+      scan ranges in that deployed geometry. People are
       blurred, and kept out of the point clouds.</details></figcaption>
   </figure>
   <div>
@@ -379,8 +380,8 @@
         Depth Anything V2-S 0.234: not resolvably different (95&nbsp;% CI &minus;0.060 to +0.118).</li>
       <li><b>Obstacles:</b> the simulator's advantage is not shown (an exploratory lean: after correction p&nbsp;=&nbsp;0.046 or 0.14, depending on which
         tests are grouped; details below).</li>
-      <li><b>Range:</b> beyond 1&nbsp;m, where the onboard rule flags an obstacle base in each depth, the network's flags are within a median
-        25&nbsp;% of the RealSense's (signed &minus;7&nbsp;%: a little nearer); most flags sit on uneven ground, not raised obstacles.</li>
+      <li><b>Range:</b> beyond 1&nbsp;m, where the onboard rule flags an obstacle base in each depth, the network's flagged range is within a median
+        25&nbsp;% of the RealSense's (signed &minus;7&nbsp;%: a little nearer); most flags sit on grass within 5&nbsp;cm of the fitted floor, not raised obstacles.</li>
       <li><b>SLAM:</b> VGGT-SLAM 2.0 agrees with the independent reference (skill +0.80); ours +0.10, the commands alone +0.08
         (same scale-fitting alignment; one run: a 0.02 gap, not a lead). As deployed, depth barely enters our trajectory.</li>
       <li><b>With ground truth (simulator):</b> our SLAM needs a better scale than its per-frame floor fit: for exact depth on one simulated loop, the true scale cuts the
@@ -461,8 +462,8 @@
   <div class="panel" id="rw-obstacles" style="margin-top:22px">
     <h3 style="margin-top:0">Obstacles and range: the same poses, two depths</h3>
     <ul class="rw-notes leads" style="margin-top:0">
-      <li><b>Beyond 1&nbsp;m, where the onboard rule flags an obstacle base, the network's flags are within a median 25&nbsp;% of the stereo's</b>, a little
-        nearer (signed &minus;7&nbsp;%); 86&nbsp;% of the stereo's flags sit on ground under 5&nbsp;cm or holes, so this compares where the rule fires, not raised obstacles.</li>
+      <li><b>Beyond 1&nbsp;m, where the onboard rule flags an obstacle base, the network's flagged range is within a median 25&nbsp;% of the stereo's</b>, a little
+        nearer (signed &minus;7&nbsp;%); 85&nbsp;% of the stereo's flags sit within 5&nbsp;cm of its fitted floor (the grass surface), so this compares where the rule fires, not raised obstacles.</li>
       <li><b>Seen from above, the two depths mark mostly different obstacle cells</b>: 16&nbsp;% of the cells either marks are marked by both (network 77&nbsp;%, stereo 39&nbsp;%).</li>
     </ul>
     <details class="stats"><summary>The numbers behind these points: rays, cells, calibration</summary>
