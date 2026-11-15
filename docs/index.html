@@ -450,7 +450,7 @@
     <h3 style="margin-top:0">Obstacles and range: the same poses, two depths</h3>
     <ul class="rw-notes leads" style="margin-top:0">
       <li><b>Beyond 1&nbsp;m the network places obstacle bases within a median 25&nbsp;% of the stereo</b>, a little nearer (signed &minus;7&nbsp;%).</li>
-      <li><b>Seen from above, the network marks far fewer obstacle cells</b>: 39&nbsp;% of the cells either map marks, against the stereo&rsquo;s 86&nbsp;%.</li>
+      <li><b>Seen from above, the two depths mark mostly different obstacle cells</b>: 19&nbsp;% of the cells either marks are marked by both (network 70&nbsp;%, stereo 49&nbsp;%).</li>
     </ul>
     <details class="stats"><summary>The numbers behind these points: rays, cells, calibration</summary>
     <ul class="rw-notes" style="margin-top:10px">
@@ -460,23 +460,25 @@
         come from ground-contact geometry and the camera height, with the onboard stack's nominal intrinsics; re-scored with the factory
         principal point (5.6&nbsp;px lower) the gap is 26&nbsp;% over 982 frames (signed &minus;13&nbsp;%), so its size does not come from the nominal intrinsics. The mount, measured from the stereo floor, is pitched 3.8&deg; down and rolled
         &minus;1.4&deg; at 0.168&nbsp;m (the onboard geometry assumes 0&deg;, 0&deg;, 0.158&nbsp;m); imposed on the onboard geometry the gap stays at 26&nbsp;%, but the
-        obstacle classification shifts, so this is a sensitivity check, not a calibrated range error. Inside 1&nbsp;m both mark grass as obstacles, in different places: the stereo marks
+        stereo then marks 97&nbsp;% of image columns blocked (63&nbsp;% as deployed), so this is a sensitivity check, not a calibrated range error. Inside 1&nbsp;m both mark grass as obstacles, in different places: the stereo marks
         63&nbsp;% of image columns blocked, the network 41&nbsp;%. Neither is right on grass, which this car drives straight over.</li>
       <li><b>Seen from above.</b> Of the 10&nbsp;cm cells in which either map holds a point at least 0.15&nbsp;m above the ground, the stereo
-        marks 86&nbsp;% and the network 39&nbsp;% (both 25&nbsp;%): the network finds 29&nbsp;% of the stereo's cells, and 63&nbsp;% of its own are
-        also the stereo's. Descriptive: the cell size and height threshold were not varied, and the network's map carries its floor-fit scale.</li>
+        marks 49&nbsp;% and the network 70&nbsp;% (both 19&nbsp;%): the network finds 40&nbsp;% of the stereo's cells, and 28&nbsp;% of its own are
+        also the stereo's. The stereo cloud is placed with the measured camera mount; a first version assumed a level camera, so its ground rose
+        into the obstacle band and the shares read 86 / 39 / 25&nbsp;% (retracted). Descriptive, not a comparison of obstacle detection: neither map
+        is ground truth, and the network flags grass bands near the path.</li>
     </ul>
     </details>
     <div class="obgrid">
       <div class="oblegend tip">
-        <p style="font-size:1.15rem;font-weight:600;margin-bottom:12px"><span style="color:#199e70">stereo 86&nbsp;%</span> &middot; <span style="color:#d95926">network 39&nbsp;%</span></p>
-        <p><span class="sw" style="background:#f4efe6"></span>marked by both: 25&nbsp;%</p>
-        <p><span class="sw" style="background:#199e70"></span>stereo only: 61&nbsp;%</p>
-        <p><span class="sw" style="background:#d95926"></span>network only: 14&nbsp;%</p>
+        <p style="font-size:1.15rem;font-weight:600;margin-bottom:12px"><span style="color:#199e70">stereo 49&nbsp;%</span> &middot; <span style="color:#d95926">network 70&nbsp;%</span></p>
+        <p><span class="sw" style="background:#f4efe6"></span>marked by both: 19&nbsp;%</p>
+        <p><span class="sw" style="background:#199e70"></span>stereo only: 30&nbsp;%</p>
+        <p><span class="sw" style="background:#d95926"></span>network only: 51&nbsp;%</p>
         <p><span class="sw" style="background:#aaacaa;height:3px;vertical-align:4px"></span>the drive</p>
         <p style="color:var(--soft)">10&nbsp;cm cells holding a point &ge;&nbsp;0.15&nbsp;m above the ground, from the same reference poses. Descriptive: the stereo cells are not ground truth.</p>
       </div>
-      <img src="assets/realworld/overlay_map.jpg" width="863" height="890" alt="Top-down map of the park: obstacle cells marked by the stereo only, the network only, or both"
+      <img src="assets/realworld/overlay_map.jpg" width="871" height="890" alt="Top-down map of the park: obstacle cells marked by the stereo only, the network only, or both"
         style="width:100%;height:auto;border-radius:12px;display:block" loading="lazy">
     </div>
   </div>
@@ -513,7 +515,7 @@
         in its camera odometry rejected any motion faster than 1.08&nbsp;m/s (1.5&times; the <em>simulated</em> car's 0.72&nbsp;m/s top speed), throwing away 23&nbsp;% of frames,
         exactly the fast ones (the odometry's own 90th-percentile speed on this drive is 2.9&nbsp;m/s). A physical bound fixes the scale
         (path within 8&nbsp;% of RTAB-Map's, the only check of the reference's scale that shares none of its inputs) but not the shape:
-        skill falls to &minus;0.38&hellip;&minus;0.62, worse than the commands alone (&minus;0.31). Uncorrected roll is the prime suspect, not yet
+        skill falls to &minus;0.38&hellip;&minus;0.62, worse than the commands alone (&minus;0.31). The camera's uncorrected mount (measured 3.8&deg; down, roll &minus;1.4&deg;) is the prime suspect, not yet
         isolated. With either gate, switching the scan match off changes neither depth arm by more than 0.015 (deployed gate: network
         &minus;0.097 vs &minus;0.111, RealSense +0.043 vs +0.029; physical gate: &minus;0.615 vs &minus;0.618, &minus;0.381 vs &minus;0.382), so the gaps
         between the arms are the same odometry on different frame sets, not the depth: this drive cannot rank the two depths
