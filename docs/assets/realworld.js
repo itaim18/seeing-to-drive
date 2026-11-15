@@ -122,7 +122,7 @@
         const ps = sep("Partial tracks (at most 23 % of the drive): not rankable against full-drive skill ");
         const pb = document.createElement("button"); pb.type = "button"; pb.className = "rw-key prt-btn"; pb.textContent = "show";
         pb.addEventListener("click", () => { const t = rows.closest("table"); t.classList.toggle("showprt"); pb.textContent = t.classList.contains("showprt") ? "hide" : "show"; });
-        ps.firstChild.appendChild(pb); rows.appendChild(ps); }                // the button shows on a phone only (prt-btn)
+        ps.firstChild.appendChild(pb); rows.appendChild(ps); }                // folded by default (tr.prt), the button unfolds
       lastGrp = x.grp; if (x.abl) x.tr.classList.add("abl"); if (x.grp === 3) x.tr.classList.add("prt"); rows.appendChild(x.tr); });
     if (!toggled) rows.appendChild(toggle());
     // time-linked hover: nearest point on any track -> every track's position at that time

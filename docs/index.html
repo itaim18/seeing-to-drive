@@ -311,7 +311,8 @@
     #realworld .oblegend p { margin: 6px 0; }
     #realworld table.bench td.n, #realworld table.bench th.n { padding-left: 28px; }
     #realworld tr.abl { display: none; } #realworld table.showabl tr.abl { display: table-row; }
-    #realworld .prt-btn { display: none; }
+    #realworld .prt-btn { display: inline-block; }
+    #realworld tr.prt { display: none; } #realworld table.showprt tr.prt { display: table-row; }
     #realworld tr.more-model { display: none; } #realworld table.showall tr.more-model { display: table-row; }
     #realworld .rw-nav { margin: 12px 0 16px; font-size: .95rem; } #realworld .rw-nav a { margin-right: 8px; padding: 3px 12px; border: 1px solid rgba(244,239,230,.25); border-radius: 999px; text-decoration: none; display: inline-block; margin-bottom: 6px; }
     #realworld .ph-grid { display: none; }
@@ -341,10 +342,8 @@
       #realworld table.hitl td:first-child { width: 50%; }
       #realworld .rw-legend { max-height: none; overflow: visible; }
       #realworld table.hitl td.n { white-space: normal; font-size: .72rem; }
-      #realworld .prt-btn { display: inline-block; }
       #realworld .ph-grid { display: block; width: 100%; height: auto; border-radius: 10px; margin: 10px 0 0; }
       #realworld .cap-more { display: none; }
-      #realworld tr.prt { display: none; } #realworld table.showprt tr.prt { display: table-row; }
       #rw-chart text { font-size: 26px; }
       #rw-chart polyline { vector-effect: non-scaling-stroke; }
     }
@@ -357,19 +356,22 @@
       There is no ground truth on this drive, so every real number below is agreement with an independent reference; questions
       that need ground truth go to the hardware-in-the-loop simulator.</p>
   </div>
-  <p class="rw-nav"><a href="#rw-depth">Depth</a><a href="#rw-obstacles">Obstacles and range</a><a href="#rw-slam">SLAM</a><a href="#rw-sim">Simulator</a></p>
+  <p class="rw-nav"><a href="#rw-depth">Depth</a><a href="#rw-obstacles">Obstacles</a><a href="#rw-slam">SLAM</a><a href="#rw-sim">Simulator</a></p>
   <figure class="figure" style="margin-top:0">
     <img class="ph-grid" src="assets/realworld/phone_stack.jpg" width="720" height="1426" alt="Four key frames of the video: the drive, the obstacle cells from above, SLAM against the reference, the end card" loading="lazy">
     <video src="assets/realworld/drive.mp4" controls playsinline muted preload="metadata" poster="assets/realworld/drive_poster.jpg"
       style="width:100%;border-radius:14px;display:block;background:#0b0e10"></video>
     <figcaption>Both panels follow the drive from the same reference poses (RTAB-Map's position and heading), behind the car's real 3-D model, so only the
-      depth differs.<span class="cap-more"> Both the 3-D panels and the top-down obstacle comparison place the clouds with the camera mount measured from
-      the stereo floor (3.8&deg; down). Each map is that source's own depth turned into a colour point cloud (left: the RealSense stereo; right: our
-      network, at the scale the car itself uses), growing as the car drives; where the depths disagree, the maps differ. The cone
+      depth differs. About 143&nbsp;s in, the video pauses for 2&nbsp;s on a bench straight ahead: the drive's largest straight-ahead disagreement
+      (+41&nbsp;% on that frame, +23&nbsp;% over its 0.4&nbsp;s); most frames differ far less (median +8&nbsp;%, 157 frames).<span class="on"> The four
+      stills above show the key frames; watch the video full-screen in landscape.</span>
+      <details class="stats cap-more"><summary>How to read the video</summary>Both the 3-D panels and the top-down obstacle comparison place the clouds
+      with the camera mount measured from the stereo floor (3.8&deg; down). Each map is that source's own depth turned into a colour point cloud (left: the
+      RealSense stereo; right: our network, at the scale the car itself uses), growing as the car drives; where the depths disagree, the maps differ. The cone
       ahead of the car is its camera's view with the live frame on it; cyan lines are this frame's pseudo-lidar rays (the deployed geometry). The line under
-      the maps is the median range gap between the two scans for obstacles beyond 1&nbsp;m; the timeline carries each frame's gap. About 143&nbsp;s into the drive
-      the video holds for 2&nbsp;s on a bench straight ahead, which the two depths place at different ranges. People are blurred, and kept out of
-      the point clouds.</span><span class="on"> The four stills above show the key frames; watch the video full-screen in landscape.</span></figcaption>
+      the maps is the median range gap between the two scans for obstacles beyond 1&nbsp;m; the timeline carries each frame's gap. The paused bench's ranges
+      (1.25 vs 1.77&nbsp;m) are scan ranges in that deployed geometry; with the measured mount the stereo puts it at 1.00&nbsp;m. People are
+      blurred, and kept out of the point clouds.</details></figcaption>
   </figure>
   <div>
     <ul class="glance">
