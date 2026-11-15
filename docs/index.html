@@ -362,7 +362,7 @@
     <video src="assets/realworld/drive.mp4" controls playsinline muted preload="metadata" poster="assets/realworld/drive_poster.jpg"
       style="width:100%;border-radius:14px;display:block;background:#0b0e10"></video>
     <figcaption>Both panels follow the drive from the same reference poses (RTAB-Map's position and heading), behind the car's real 3-D model, so only the
-      depth differs. About 143&nbsp;s in, the video pauses for 2&nbsp;s on the drive's largest straight-ahead disagreement between the onboard
+      depth differs. About 143&nbsp;s in, the video pauses for 5&nbsp;s on the drive's largest straight-ahead disagreement between the onboard
       scans (+41&nbsp;% on that frame, +23&nbsp;% over its 0.4&nbsp;s; median +8&nbsp;% over the 157 frames with a flag straight ahead): at a bench
       1.00&nbsp;m away by the stereo's metric depth, the stereo scan reads 1.25&nbsp;m mostly on its seat (13 of 19 rays, overhang rule), the network's 1.77&nbsp;m on the ground (vertical-face rule).<span class="on"> The four
       stills above show the key frames; watch the video full-screen in landscape.</span>
@@ -474,7 +474,8 @@
         full-resolution stereo at its pixels: of the 26,142 stereo flags the gap uses, 85&nbsp;% lie under 5&nbsp;cm above the stereo's fitted
         floor, 1&nbsp;% on holes, 7&nbsp;% on raised points (the rest from the overhang detector). Free of the rule, the network's floor-fit metric depth
         against the stereo's, pixel by pixel (post hoc), reads raised structure nearer beyond 1.5&nbsp;m: 0.78 (0.66&ndash;0.92) at 1.5&ndash;2&nbsp;m and 0.69 (0.57&ndash;0.79)
-        at 2&ndash;3&nbsp;m (network / stereo, 95&nbsp;% CI), the ground alike; within 1.5&nbsp;m no bias is resolved. Both ranges
+        at 2&ndash;3&nbsp;m (network / stereo, 95&nbsp;% block CI); not resolved at 0.6&ndash;1.5&nbsp;m; farther, weakly, at 0.3&ndash;0.6&nbsp;m (1.21 (1.01&ndash;2.15), 8 blocks);
+        the ground reads nearer from 0.6&nbsp;m. This cannot separate the network's depth from its floor-fit scale. Both ranges
         come from ground-contact geometry and the camera height, with the onboard stack's nominal intrinsics; re-scored with the factory
         principal point (5.6&nbsp;px lower) the gap is 26&nbsp;% over 982 frames (signed &minus;13&nbsp;%), so its size does not come from the nominal intrinsics. The mount, measured from the stereo floor, is pitched 3.8&deg; down and rolled
         &minus;1.4&deg; at 0.168&nbsp;m (the onboard geometry assumes 0&deg;, 0&deg;, 0.158&nbsp;m); imposed on the onboard geometry the gap stays at 26&nbsp;%, but the
