@@ -576,7 +576,8 @@
     <p class="tip" style="margin:8px 0 0"> Giving exact depth
       its true scale instead of the per-frame floor-fit scale from camera height cuts the error 6.8&times; after loop closure
       (6.3&ndash;7.4&times; per session; 3.1&times; for the front end alone). On seven further start seeds, fixed in advance, it is 6.5&times; (95&nbsp;% CI 5.5&ndash;7.7) (0.620 &rarr; 0.094&nbsp;m;
-      every seed lower; three seeds excluded: one displaced at spawn, two with blank depth renders). Smoothing the floor-fit scale in time does not recover it: on exact depth the fit puts a true 2&nbsp;m at a median
+      every seed lower; three seeds excluded: one displaced at spawn, two with blank depth renders). On those seeds our network under the same
+      floor-fit scale is not distinguishable from exact depth (ratio 0.75, 95&nbsp;% CI 0.49&ndash;1.14): the scale, not the depth, is the bottleneck. Smoothing the floor-fit scale in time does not recover it: on exact depth the fit puts a true 2&nbsp;m at a median
       1.07&times;, and at 1&ndash;2&nbsp;m that error drifts slowly along the route rather than jittering, so a filter cannot remove it (slow drift is one explanation; the fit's distance-dependent bias is another, untested).
       Every camera arm except true-scale exact depth is worse than the commands alone. Of the ways to get a correct scale, only
       stereo was tested here; an IMU or a metric model is untested.</p>
