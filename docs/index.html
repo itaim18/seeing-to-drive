@@ -577,11 +577,12 @@
       its true scale instead of the per-frame floor-fit scale from camera height cuts the error 6.8&times; on the original loop
       (6.3&ndash;7.4&times; per session; 3.1&times; for the front end alone). On seven further start seeds, fixed in advance, it is 6.5&times; (95&nbsp;% CI 5.5&ndash;7.7): 0.620 to 0.094&nbsp;m,
       every seed lower; three seeds excluded (one displaced at spawn, two with blank depth renders). Re-rendered at evening and dusk (the
-      same drives; exact depth ignores lighting), the true scale lowers the error in every session: evening 6.8&times; (5.7&ndash;8.1) and dusk 6.2&times; (5.4&ndash;7.1).</p>
+      same drives; exact depth ignores lighting), the true scale lowers the error in every session: evening 6.8&times; (5.7&ndash;8.1) and dusk 6.2&times; (5.4&ndash;7.1). Driven the other way round (the same place and props, every
+      view different; seven of ten seeds valid) it is 6.3&times; (95&nbsp;% CI 5.7&ndash;6.9), lower in every session.</p>
     <p class="tip" style="margin:12px 0 0"><b>Our network against exact depth.</b> Under the same floor-fit scale our network's error over exact
-      depth's is 0.75&times; at noon (95&nbsp;% CI 0.49&ndash;1.14, at most 14&nbsp;% worse), 0.66&times; at evening (0.57&ndash;0.78, lower) and 0.97&times; at dusk (0.70&ndash;1.36, at most 36&nbsp;% worse): never distinguishably worse. For exact depth the bottleneck is the scale; for our network, fitting the scale to exact depth never closes
+      depth's is 0.75&times; at noon (95&nbsp;% CI 0.49&ndash;1.14, at most 14&nbsp;% worse), 0.66&times; at evening (0.57&ndash;0.78, lower) and 0.97&times; at dusk (0.70&ndash;1.36, at most 36&nbsp;% worse), and 0.98&times; (95&nbsp;% CI 0.68&ndash;1.42) driven the other way: never distinguishably worse. For exact depth the bottleneck is the scale; for our network, fitting the scale to exact depth never closes
       the gap. Fitted per frame (scale and shift) over the whole image, the network's error falls only
-      1.5&times; (95&nbsp;% CI 1.1&ndash;2.3; exact depth's falls 6.5&times;): at noon, on the terrain it was fine-tuned on, it stays 3.2&times; exact depth's true-scale error (95&nbsp;% CI 2.4&ndash;4.2), at evening and dusk 8.1&times; (5.6&ndash;11.6) and 9.0&times; (7.8&ndash;10.4). Fitted on the
+      1.5&times; (95&nbsp;% CI 1.1&ndash;2.3; exact depth's falls 6.5&times;): at noon, on the terrain it was fine-tuned on, it stays 3.2&times; exact depth's true-scale error (95&nbsp;% CI 2.4&ndash;4.2), at evening and dusk 8.1&times; (5.6&ndash;11.6) and 9.0&times; (7.8&ndash;10.4), driven the other way 7.0&times; (5.9&ndash;8.3). Fitted on the
       scan's own rows instead, the network's error stays 5.3&times; at noon (95&nbsp;% CI 4.1&ndash;6.7), and at evening and dusk the network's own floor fit beats both fits. None of the
       three affine scales tried (the floor fit, the two fits to exact depth) closes the gap. The closer fit on the scan's rows (rms
       <span style="white-space:nowrap">0.09&ndash;0.12&nbsp;m<sup>&minus;1</sup></span>, against 0.19&ndash;0.23 image-wide) is no better, and at noon and dusk worse, so
