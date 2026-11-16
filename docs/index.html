@@ -364,6 +364,12 @@
     <img class="ph-grid" src="assets/realworld/phone_stack.jpg" width="720" height="1426" alt="Four key frames of the video: the drive, the obstacle cells from above, SLAM against the reference, the end card" loading="lazy">
     <video src="assets/realworld/drive.mp4" controls playsinline muted preload="metadata" poster="assets/realworld/drive_poster.jpg"
       style="width:100%;border-radius:14px;display:block;background:#0b0e10"></video>
+    <script>(function () {   /* phones: the encode with a taller band under the timeline, for the native controls */
+      var v = document.currentScript.previousElementSibling;
+      if (v && v.tagName === "VIDEO" && window.matchMedia && matchMedia("(max-width: 600px)").matches) {
+        v.poster = "assets/realworld/drive_poster_phone.jpg"; v.src = "assets/realworld/drive_phone.mp4";
+      }
+    })();</script>
     <figcaption>Both panels follow the drive from the same reference poses (RTAB-Map's position and heading), behind the car's real 3-D model, so only the
       depth differs. About 143&nbsp;s in, the video pauses for 5&nbsp;s on the drive's largest straight-ahead disagreement between the onboard
       scans (+41&nbsp;% on that frame, +23&nbsp;% over its 0.4&nbsp;s; median +8&nbsp;% over the 157 frames with a flag straight ahead): at a bench
