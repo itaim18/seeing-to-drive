@@ -580,7 +580,7 @@
       same drives; exact depth ignores lighting), the true scale lowers the error in every session: evening 6.8&times; (5.7&ndash;8.1) and dusk 6.2&times; (5.4&ndash;7.1). Under the same floor-fit
       scale our network's error over exact depth's is 0.75&times; at noon (95&nbsp;% CI 0.49&ndash;1.14, at most 14&nbsp;% worse), 0.66&times; at evening (0.57&ndash;0.78, lower) and 0.97&times; at dusk (0.70&ndash;1.36, at most 36&nbsp;% worse): never distinguishably worse. With the floor-fit scale the bottleneck is the scale. Given a per-frame affine scale and shift fitted to exact
       depth over the whole image, our network's error falls only 1.5&times; (95&nbsp;% CI 1.1&ndash;2.3), against exact depth's 6.5&times;, and stays 3.2&times; exact depth's at noon (95&nbsp;% CI 2.4&ndash;4.2), on the
-      terrain it was fine-tuned on: no affine scale closes the gap, because the network's disparity is not affine to exact 1/Z (fit rms
+      terrain it was fine-tuned on: neither affine scale tried (this fit, the floor fit) closes the gap; the network's disparity is not affine to exact 1/Z over the image (fit rms
       0.19&ndash;0.23&nbsp;m<sup>&minus;1</sup>). On the evening and dusk renders it is 8.1&times; (5.6&ndash;11.6) and 9.0&times; (7.8&ndash;10.4), and there the fitted scale is worse than the
       network's own floor fit: it is not the best scale for the scan. Smoothing the floor-fit scale in time does not recover it: on exact depth the fit puts a true 2&nbsp;m at a median
       1.07&times;, and at 1&ndash;2&nbsp;m that error drifts slowly along the route rather than jittering, so a filter cannot remove it (slow drift is one explanation; the fit's distance-dependent bias is another, untested).
