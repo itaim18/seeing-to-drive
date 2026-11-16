@@ -493,7 +493,9 @@
       <li><b>What the ground-flagging costs (post hoc).</b> Replayed open loop along the drive with the same measured mount, the planner
         stops on 37&nbsp;% (23&ndash;50&nbsp;%) of frames with the network's depth and 83&nbsp;% (75&ndash;90&nbsp;%) with the stereo's (34&nbsp;% as deployed; 95&nbsp;% block CIs);
         ground- and hole-classed flags are implicated in at most 84&ndash;87&nbsp;% of those stops (an upper bound: columns whose first flag is
-        ground are emptied, not re-scanned). Decision counts, not a safety measure.</li>
+        ground are emptied, not re-scanned). Decision counts, not a safety measure. A pre-registered search over 11 stricter variants of the rule
+        (floor threshold up to 15&nbsp;cm, run length up to 12 rows) found none to carry to new drives: each loses 22&ndash;42 points of detection
+        recall on some simulated approach to a cone, box or barrel; on the drive they cut grass flags (74&nbsp;% of flags ground- or hole-classed with the deployed rule, 48&ndash;72&nbsp;% with the stricter ones) but barely the stops (27&nbsp;% of frames stopped, 26&ndash;27&nbsp;% with the stricter ones up to 10&nbsp;cm).</li>
       <li><b>Seen from above.</b> Of the 10&nbsp;cm cells in which either map holds a point at least 0.15&nbsp;m above the ground, the stereo
         marks 39&nbsp;% and the network 77&nbsp;% (both 16&nbsp;%): the network finds 40&nbsp;% of the stereo's cells, and 20&nbsp;% of its own are
         also the stereo's. Both clouds are placed with the measured camera mount (the stereo by its floor normal, the network at the measured horizon
