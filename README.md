@@ -4,7 +4,7 @@
 
 **Attention-free distilled depth on a Raspberry Pi 5 + Hailo-8L, and the onboard obstacle avoidance, planning and SLAM it enables**
 
-Itai M. · 2026
+Itai Mizlish and Boaz Ben-Moshe · Ariel University · 2026
 
 [Project page](https://itaim18.github.io/seeing-to-drive/) · [Paper](docs/paper.pdf) · [Thesis](docs/thesis.pdf) ·
 [Dataset](https://huggingface.co/datasets/itaimizlish/daniel-yard-depth) · [Model](https://huggingface.co/itaimizlish/daniel-student-depth)
@@ -20,9 +20,8 @@ on Hugging Face; the code is available on request.
 
 ```bibtex
 @misc{itaim2026seeing,
-  title  = {Seeing to Drive on a Single Board: Attention-Free Distilled Depth on a Raspberry Pi 5 + Hailo-8L
-            for Onboard Obstacle Avoidance, Planning and SLAM},
-  author = {M., Itai},
+  title  = {Seeing to Drive on a Single Board: Attention-Free Depth for Onboard Robot Navigation},
+  author = {Mizlish, Itai and Ben-Moshe, Boaz},
   year   = {2026},
   url    = {https://itaim18.github.io/seeing-to-drive/}
 }
