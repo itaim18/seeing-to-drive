@@ -33,7 +33,9 @@
     <a href="#demos">Demos</a>
     <a href="#method" class="opt">Method</a>
     <a href="#results">Results</a>
+    <a href="#promo">Video</a>
     <a href="#realworld">Real world</a>
+    <a href="#realcar" class="opt">Real car</a>
     <a href="paper.pdf">Paper</a>
     <a href="https://huggingface.co/datasets/itaimizlish/daniel-yard-depth" class="opt">Data</a>
   </nav>
@@ -57,12 +59,31 @@
       <a class="button" href="thesis.pdf">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4zm16 0h-4a3 3 0 0 0-1.5.4V19a3 3 0 0 1 1.5-.5H20z"/></svg>Thesis</a>
       <a class="button" href="https://huggingface.co/datasets/itaimizlish/daniel-yard-depth">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3zm-8 5.3C5.6 9.5 8.6 10.2 12 10.2s6.4-.7 8-1.9V12c0 1.7-3.6 3-8 3s-8-1.3-8-3zm0 6c1.6 1.2 4.6 1.9 8 1.9s6.4-.7 8-1.9V18c0 1.7-3.6 3-8 3s-8-1.3-8-3z"/></svg>Dataset</a>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3zm-8 5.3C5.6 9.5 8.6 10.2 12 10.2s6.4-.7 8-1.9V12c0 1.7-3.6 3-8 3s-8-1.3-8-3zm0 6c1.6 1.2 4.6 1.9 8 1.9s6.4-.7 8-1.9V18c0 1.7-3.6 3-8 3s-8-1.3-8-3z"/></svg>Sim data</a>
+      <a class="button" href="https://huggingface.co/datasets/itaimizlish/daniel-real-drives">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3zm-8 5.3C5.6 9.5 8.6 10.2 12 10.2s6.4-.7 8-1.9V12c0 1.7-3.6 3-8 3s-8-1.3-8-3zm0 6c1.6 1.2 4.6 1.9 8 1.9s6.4-.7 8-1.9V18c0 1.7-3.6 3-8 3s-8-1.3-8-3z"/></svg>Real drives</a>
       <a class="button" href="https://huggingface.co/itaimizlish/daniel-student-depth">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7zm0 2.3L18.6 8 12 11.7 5.4 8zM5 9.7l6 3.4v6.6l-6-3.4zm8 10V13l6-3.3v6.6z"/></svg>Model</a>
       <a class="button" href="#cite">BibTeX</a>
     </div>
     <p class="wipe-hint" aria-hidden="true"><span><b>left</b> 4K camera, outdoors</span><span><b>right</b> depth computed on the Hailo-8L, every frame</span></p>
+  </div>
+</section>
+
+<section class="section" id="promo" aria-labelledby="promo-title">
+  <div class="section-heading">
+    <p class="eyebrow">The project in 70 seconds</p>
+    <h2 id="promo-title">From the chip to the car.</h2>
+  </div>
+  <div class="video-grid">
+    <article class="video-card feature">
+      <video controls playsinline muted preload="metadata" poster="assets/media/promo_poster.jpg"><source src="assets/media/promo.mp4" type="video/mp4"></video>
+      <div class="video-copy"><span class="tag g">Silent, captioned</span>
+        <h3>DANIEL, start to finish</h3>
+        <p>The chip, the network distilled for it, the stack it drives, the hardware-in-the-loop test, the hand-driven park drive, the
+          first autonomous lab missions and a night drive. Every number on screen is the paper's or the run logs'.
+          <a href="assets/media/promo_phone.mp4">Phone version (9:16)</a>.</p></div>
+    </article>
   </div>
 </section>
 
@@ -287,7 +308,8 @@
     <a class="res" href="paper.pdf"><b>Paper</b><span>13 pages, IEEE two-column</span></a>
     <a class="res" href="thesis.pdf"><b>Thesis</b><span>39 pages, Ariel University format</span></a>
     <div class="res"><b>Code</b><span>onboard stack, HITL harness, scorers: available on request</span></div>
-    <a class="res" href="https://huggingface.co/datasets/itaimizlish/daniel-yard-depth"><b>Dataset</b><span>11.5 GB: benchmark, training set, loop logs</span></a>
+    <a class="res" href="https://huggingface.co/datasets/itaimizlish/daniel-yard-depth"><b>Sim dataset</b><span>11.5 GB: benchmark, training set, loop logs</span></a>
+    <a class="res" href="https://huggingface.co/datasets/itaimizlish/daniel-real-drives"><b>Real drives</b><span>every sensor of the real car, 7 sessions, people blurred</span></a>
     <a class="res" href="https://huggingface.co/itaimizlish/daniel-student-depth"><b>Model</b><span>PyTorch, ONNX, Hailo-8L HEF</span></a>
   </div>
 </section>
@@ -648,6 +670,39 @@
         outputs on the chip are poor outdoors (an indoor-trained model).</li>
     </ul>
   </details>
+</section>
+
+<section class="section" id="realcar" aria-labelledby="realcar-title">
+  <div class="section-heading">
+    <p class="eyebrow">The real car, November 2026</p>
+    <h2 id="realcar-title">First autonomous missions, a night drive, and every recording open.</h2>
+    <p class="lead">The Pi 5 + Hailo-8L stack on the Traxxas, with a RealSense D435 recording every stream beside it. The car has no wheel
+      encoder or gyro, so its pose is camera-only (the paper's own-pose results use a simulated encoder and gyro). These
+      runs are exploratory: they are not part of the paper's tables.</p>
+  </div>
+  <div class="video-grid">
+    <article class="video-card">
+      <video controls playsinline muted preload="none" poster="assets/media/lab_missions_poster.jpg"><source src="assets/media/lab_missions.mp4" type="video/mp4"></video>
+      <div class="video-copy"><span class="tag c">Autonomous · lab · 19 Nov</span>
+        <h3>Ten goal missions in a cluttered lab</h3>
+        <p>Map and dead-end memory live on the Pi. One mission arrived (0.39&nbsp;m from the goal by the car's own pose estimate, after 22.5&nbsp;s), three timed out
+          after 60&nbsp;s of driving, five were cancelled or replaced by a new goal (two before moving), one ended in a manual override. The recording showed the network seeing a near
+          obstacle the stereo does not on about 11&nbsp;% of near frames; a stereo veto and a stuck-reverse guard came out of it.
+          Shown at 4&times;, people blurred.</p></div>
+    </article>
+    <article class="video-card">
+      <video controls playsinline muted preload="none" poster="assets/media/night_vs_day_poster.jpg"><source src="assets/media/night_vs_day.mp4" type="video/mp4"></video>
+      <div class="video-copy"><span class="tag">Day vs night · same park</span>
+        <h3>At night the stereo still ranges; the camera network does not</h3>
+        <p>The D435's active stereo still ranges 85&nbsp;% of the view at night; our RGB network loses the scene, and the onboard
+          scan fires within 1&nbsp;m on 91&nbsp;% of night frames against 46&nbsp;% by day (another route; the stereo fires on 93&ndash;100&nbsp;%). One night drive, exploratory:
+          drive the RGB stack in daylight.</p></div>
+    </article>
+  </div>
+  <div class="resources" style="margin-top:22px">
+    <a class="res" href="https://huggingface.co/datasets/itaimizlish/daniel-real-drives"><b>Every real recording</b><span>7 REC ALL sessions: colour, stereo depth, both IR, the Hailo output and every command, people blurred</span></a>
+    <a class="res" href="https://huggingface.co/datasets/itaimizlish/daniel-real-drives/tree/main/cockpit"><b>Cockpit logs</b><span>129 runs over 5 days: brain, camera pose, 20 Hz commands, mission state</span></a>
+  </div>
 </section>
 
 <section class="section" id="cite" aria-labelledby="cite-title">
