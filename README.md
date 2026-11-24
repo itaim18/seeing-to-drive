@@ -6,7 +6,7 @@
 
 Itai Mizlish and Boaz Ben-Moshe · Ariel University · 2026
 
-[Project page](https://itaim18.github.io/seeing-to-drive/) · [Paper](docs/paper.pdf) · [Thesis](docs/thesis.pdf) ·
+[Code](https://github.com/itaim18/DANIEL) · [Project page](https://itaim18.github.io/seeing-to-drive/) · [Paper](docs/paper.pdf) · [Thesis](docs/thesis.pdf) ·
 [Dataset](https://huggingface.co/datasets/itaimizlish/daniel-yard-depth) · [Model](https://huggingface.co/itaimizlish/daniel-student-depth)
 
 <a href="https://itaim18.github.io/seeing-to-drive/"><img src="docs/assets/media/teaser.gif" width="100%" alt="4K camera on the left, depth computed on the Hailo-8L on the right">
@@ -15,14 +15,14 @@ Itai Mizlish and Boaz Ben-Moshe · Ariel University · 2026
 
 </div>
 
-This repository holds the project page (`docs/`). The weights (PyTorch, ONNX, Hailo-8L HEF) and the 11.5 GB dataset are
-on Hugging Face; the code is available on request.
+This repository holds the project page (`docs/`). The code is at [itaim18/DANIEL](https://github.com/itaim18/DANIEL); the weights (PyTorch, ONNX,
+Hailo-8L HEF) and the datasets are on Hugging Face.
 
 ```bibtex
-@misc{itaim2026seeing,
+@misc{mizlish2026seeing,
   title  = {Seeing to Drive on a Single Board: Attention-Free Depth for Onboard Robot Navigation},
   author = {Mizlish, Itai and Ben-Moshe, Boaz},
   year   = {2026},
-  url    = {https://itaim18.github.io/seeing-to-drive/}
+  url    = {https://github.com/itaim18/DANIEL}
 }
 ```
